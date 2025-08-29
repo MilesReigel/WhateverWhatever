@@ -2,20 +2,11 @@
 
 using namespace std;
 
-// Take vector coefficient inputs 
-void input();
-
-// Arrange into an array
 // Take determinant of array
 // Create string output
 
-int main()
-{
-    
-
-    return 0;
-}
-
+// Take vector coefficient inputs,
+// Arrange into an array
 void input()
 {
     int coef[2][3];
@@ -31,5 +22,14 @@ void input()
             cin >> coef[1][i-3];
         }
     } 
-    cout << coef;
+    int icoef = ((coef[0][1])*(coef[1][2])-(coef[0][2])*(coef[1][1]));
+    int jcoef = ((coef[0][2])*(coef[1][0])-(coef[0][0])*(coef[1][2]));
+    int kcoef = ((coef[0][0])*(coef[1][1])-(coef[0][1])*(coef[1][0]));
+}
+
+int main()
+{
+    input();
+
+    return 0;
 }
