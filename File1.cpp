@@ -2,14 +2,34 @@
 
 using namespace std;
 
-void input()
-{
+// Take vector coefficient inputs 
+void input();
 
-}
+// Arrange into an array
+// Take determinant of array
+// Create string output
 
 int main()
 {
-    cout << "E" << endl;
+    
 
     return 0;
+}
+
+void input()
+{
+    int x;
+    int coef[2][3];
+    for (int i = 0; i < 6; i++)
+    {
+        cout << "Input coefficient " << i + 1 << ": " << endl;
+        if (i < 3 )
+        {
+            cin >> coef[0][i];
+        }
+        else
+        {
+            cin >> coef[1][i-3];
+        }
+    } 
 }
