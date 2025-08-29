@@ -2,8 +2,14 @@
 
 using namespace std;
 
+void input()
+{
+
+}
+
 int main()
 {
-    cout << "peenuts" << endl;
+    cout << "E" << endl;
+
     return 0;
 }
