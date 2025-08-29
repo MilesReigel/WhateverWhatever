@@ -18,7 +18,6 @@ int main()
 
 void input()
 {
-    int x;
     int coef[2][3];
     for (int i = 0; i < 6; i++)
     {
