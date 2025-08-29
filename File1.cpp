@@ -31,4 +31,5 @@ void input()
             cin >> coef[1][i-3];
         }
     } 
+    cout << coef;
 }
