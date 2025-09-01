@@ -25,6 +25,9 @@ void input()
     int icoef = ((coef[0][1])*(coef[1][2])-(coef[0][2])*(coef[1][1]));
     int jcoef = ((coef[0][2])*(coef[1][0])-(coef[0][0])*(coef[1][2]));
     int kcoef = ((coef[0][0])*(coef[1][1])-(coef[0][1])*(coef[1][0]));
+
+    cout << "Your determinant is:" << endl;
+    cout << icoef << "X + " << jcoef << "Y + " << kcoef << "Z." << endl;
 }
 
 int main()
