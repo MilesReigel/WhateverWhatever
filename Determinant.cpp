@@ -2,11 +2,6 @@
 
 using namespace std;
 
-// Take determinant of array
-// Create string output
-// Take vector coefficient inputs,
-// Math and ouput
-
 void input2x2()
 {
     int coef2x2[2][2];
@@ -36,7 +31,7 @@ void input3x3()
         {
             cin >> coef[0][i];
         }
-        else if (3 < i < 7)
+        else if (3 < i && i < 7)
         {
             cin >> coef[1][i - 3];
         }
