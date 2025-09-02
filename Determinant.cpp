@@ -17,10 +17,6 @@ void input2x2()
             cin >> coef2x2[1][i-2];
         }
     }
-    cout << coef2x2[0][0] << endl;
-    cout << coef2x2[0][1] << endl;
-    cout << coef2x2[1][0] << endl;
-    cout << coef2x2[1][1] << endl;
 
     int output = ((coef2x2[0][0] * coef2x2[1][1]) - (coef2x2[0][1] * coef2x2[1][0]));
     cout << output << endl;
@@ -42,7 +38,7 @@ void input3x3()
         }
         else
         {
-            cin >> coef[2][i-6];
+            cin >> coef[2][i - 6];
         }
     }
     int x = (coef[0][0])*(((coef[1][1])*(coef[2][2])) - (coef[1][2])*(coef[2][1]));
@@ -64,12 +60,12 @@ void inputCross()
         }
         else
         {
-            cin >> coef[1][i-3];
+            cin >> coef[1][i - 3];
         }
     } 
-    int icoef = ((coef[0][1])*(coef[1][2])-(coef[0][2])*(coef[1][1]));
-    int jcoef = ((coef[0][2])*(coef[1][0])-(coef[0][0])*(coef[1][2]));
-    int kcoef = ((coef[0][0])*(coef[1][1])-(coef[0][1])*(coef[1][0]));
+    int icoef = ((coef[0][1]) * (coef[1][2])-(coef[0][2]) * (coef[1][1]));
+    int jcoef = ((coef[0][2]) * (coef[1][0])-(coef[0][0]) * (coef[1][2]));
+    int kcoef = ((coef[0][0]) * (coef[1][1])-(coef[0][1]) * (coef[1][0]));
 
     cout << "Your cross-product is: ";
     cout << icoef << "X + " << jcoef << "Y + " << kcoef << "Z." << endl;
