@@ -45,7 +45,7 @@ void input3x3()
     int y = (coef[0][1])*(((coef[1][2])*(coef[2][0])) - (coef[1][0])*(coef[2][2]));
     int z = (coef[0][2])*(((coef[1][0])*(coef[2][1])) - (coef[1][1])*(coef[2][0]));
     int output = x + y + z;
-    cout << output;
+    cout << output << endl;
 }
 
 void inputCross()
