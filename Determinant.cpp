@@ -73,16 +73,16 @@ void inputCross()
 
 int main()
 {
-    string choice;
+    int choice;
     cout << "What kind of determinant would you like to take?" << endl; 
-    cout << "The options are A)2x2, B)3x3, or C)Vector Cross Product" << endl;
+    cout << "The options are 1)2x2, 2)3x3, or 3)Vector Cross Product" << endl;
     cin >> choice;
 
-    if (choice == "a" || "A")
+    if (choice == 1)
     {
         input2x2();
     } 
-    else if (choice == "b" || "B")
+    else if (choice == 2)
     {
         input3x3();
     }
