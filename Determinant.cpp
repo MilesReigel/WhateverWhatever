@@ -20,7 +20,7 @@ void input2x2()
     cout << coef2x2[0][0] << endl;
     cout << coef2x2[0][1] << endl;
     cout << coef2x2[1][0] << endl;
-    cout << coef2x2[1][2] << endl;
+    cout << coef2x2[1][1] << endl;
 
     int output = ((coef2x2[0][0] * coef2x2[1][1]) - (coef2x2[0][1] * coef2x2[1][0]));
     cout << output << endl;
