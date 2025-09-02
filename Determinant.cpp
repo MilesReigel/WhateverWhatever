@@ -17,8 +17,12 @@ void input2x2()
             cin >> coef2x2[1][i];
         }
     }
+    cout << coef2x2[0][0];
+    cout << coef2x2[0][1];
+    cout << coef2x2[1][0];
+    cout << coef2x2[1][2];
     int output = ((coef2x2[0][0] * coef2x2[1][1]) - (coef2x2[0][1] * coef2x2[1][0]));
-    cout << output;
+    cout << output << endl;
 }
 
 void input3x3()
