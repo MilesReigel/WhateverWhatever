@@ -10,7 +10,8 @@
                 "UNICODE",
                 "_UNICODE"
             ],
-            "compilerPath": "c:\\MSYS2\\ucrt64\\bin\\g++"
+            "compilerPath": "c:\\MSYS2\\ucrt64\\bin\\g++",
+            "cppStandard": "c++17"
         }
     ],
     "version": 4
