@@ -8,20 +8,36 @@ ESP32_NAME = "TorlaserESP32-test"  # BLE device name
 SERVICE_UUID = "4bcbf75c-adec-4630-9086-490f413ff514"
 UART_RX_CHAR_UUID = "4bcbf75d-adec-4630-9086-490f413ff514"
 mouse_x, mouse_y = 0, 0
+lastx, lasty = 0, 0
+programOn = True
 client = None
 WINDOW_WIDTH = 500
 WINDOW_HEIGHT = 500
-SEND_INTERVAL_MS = 50
-
-# Event Handlers/ UI
-def on_mouse_move(event):
-    global mouse_x, mouse_y
-    mouse_x = max(0, min(event.x, WINDOW_WIDTH))
-    mouse_y = max(0, min(event.y, WINDOW_HEIGHT))
+SEND_INTERVAL_MS = 25
 
 async def tkinterUI(loop, send_queue):
     global programOn
 
+    #Notification Function for auto mode
+    def AutoRunOnOff():
+        if AutoRunTF.get():
+            print("Auto Mode Enabled")
+        else: 
+            print("Auto Mode Disabled")
+
+    #Exit Function
+    def annihilation():
+        global programOn
+        programOn = False
+        print("Terminating Program")
+        root.destroy()
+    
+    # Event Handlers/ UI
+    def on_mouse_move(event):
+        global mouse_x, mouse_y
+        mouse_x = max(0, min(event.x, WINDOW_WIDTH))
+        mouse_y = max(0, min(event.y, WINDOW_HEIGHT))
+    
     #Tkinter GUI
     root = tk.Tk()
     root.title("ESP32 Mouse Controller")
@@ -37,46 +53,35 @@ async def tkinterUI(loop, send_queue):
     canvas.create_line(0, WINDOW_HEIGHT/2, WINDOW_WIDTH, WINDOW_HEIGHT/2, activewidth = 3)
     canvas.create_line(WINDOW_WIDTH/2, 0, WINDOW_WIDTH/2, WINDOW_HEIGHT, activewidth = 3)
     canvas.bind("<Motion>", on_mouse_move)
-    root.protocol("WM_DELETE_WINDOW", command = annihilation)
-
-    #Notification Function for auto mode
-    def AutoRunOnOff():
-        if AutoRunTF.get():
-            print("Auto Mode Enabled")
-        else: 
-            print("Auto Mode Disabled")
-
-    #Exit Function
-    def annihilation():
-        global programOn
-        programOn = False
-        print("Terminating Program")
-        root.destroy()
+    root.protocol("WM_DELETE_WINDOW", annihilation)
 
     #Update GUI loop
     async def tk_loop():
-        global programOn
+        global programOn, mouse_x, mouse_y, lastx, lasty
         while programOn:
             try:
                 root.update()
                 positionLabel['text'] = f"X:{mouse_x}, Y:{WINDOW_HEIGHT - mouse_y}"
                 if not AutoRunTF.get():
-                    await send_queue.put((mouse_x, mouse_y))
+                    if (abs(mouse_x - lastx) > 5  or abs(mouse_y - lasty) > 5):
+                        await send_queue.put((mouse_x, mouse_y))
+                        lastx = mouse_x
+                        lasty = mouse_y
                 await asyncio.sleep(0.01)
             except tk.TclError:
                 break
     
-    #Auto Run Function Itself
+    #Auto Run Function
     async def autoRunFunction():
-        global mouse_x, mouse_y
+        global programOn
         while programOn:
             if AutoRunTF.get():
-                mouse_x = r.randint(0, WINDOW_WIDTH)
-                mouse_y = r.randint(0, WINDOW_WIDTH)
-                await send_queue.put((mouse_x, mouse_y))
-            await asyncio.sleep(3)
+                mx = r.randint(0, WINDOW_WIDTH)
+                my = r.randint(0, WINDOW_WIDTH)
+                await send_queue.put((mx, my))
+            await asyncio.sleep(2.5)
     
-    return root, [tk_loop(), autoRunFunction()]
+    return [tk_loop(), autoRunFunction()]
 
 #Connection to ESP32
 async def BTConnection_ESP32():
@@ -96,6 +101,7 @@ async def send_mouse_data(client, send_queue):
         try:
             x, y = await send_queue.get()
             msg = f"{x},{y}".encode("utf-8")
+            print(f"Sending {x},{y}")
             await client.write_gatt_char(UART_RX_CHAR_UUID, msg)
         except Exception as e:
             print("BLE write error: ", e)
@@ -111,7 +117,7 @@ async def main():
         print("Connection error: ", e)
         return
     
-    root, tasks = tkinterUI(asyncio.get_event_loop(), send_queue)
+    tasks = await tkinterUI(asyncio.get_event_loop(), send_queue)
     #Sends Queue Data to Tx function
     await asyncio.gather(*tasks, send_mouse_data(client, send_queue))
 
