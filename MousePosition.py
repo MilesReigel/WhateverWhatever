@@ -13,7 +13,7 @@ programOn = True
 client = None
 WINDOW_WIDTH = 500
 WINDOW_HEIGHT = 500
-SEND_INTERVAL_MS = 25
+SEND_INTERVAL_MS = 10
 
 async def tkinterUI(loop, send_queue):
     global programOn
