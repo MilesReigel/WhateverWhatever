@@ -10,13 +10,15 @@ UART_RX_CHAR_UUID = "4bcbf75d-adec-4630-9086-490f413ff514"
 mouse_x, mouse_y = 0, 0
 lastx, lasty = 0, 0
 programOn = True
+laserOn = False
 client = None
 WINDOW_WIDTH = 500
 WINDOW_HEIGHT = 500
 SEND_INTERVAL_MS = 10
 
+#Everything in the UI
 async def tkinterUI(loop, send_queue):
-    global programOn
+    global programOn, laserOn
 
     #Notification Function for auto mode
     def AutoRunOnOff():
@@ -31,8 +33,17 @@ async def tkinterUI(loop, send_queue):
         programOn = False
         print("Terminating Program")
         root.destroy()
+
+    #Laser Toggle Function
+    async def laserOnFunction():
+        global programOn, laserOn
+        if programOn:
+            await send_queue.put(WINDOW_WIDTH + 1, WINDOW_HEIGHT + 1)
+            laserOn = not laserOn
+    def onLaserToggle():
+        asyncio.create_task(laserOnFunction())
     
-    # Event Handlers/ UI
+    #Mouse Movement Handler
     def on_mouse_move(event):
         global mouse_x, mouse_y
         mouse_x = max(0, min(event.x, WINDOW_WIDTH))
@@ -47,6 +58,7 @@ async def tkinterUI(loop, send_queue):
     canvas.pack()
     AutoRunTF = tk.BooleanVar()
     tk.Checkbutton(canvas, font = ("Times New Roman", 10), text = "Auto Mode", bd = 3, variable = AutoRunTF, command = AutoRunOnOff).place(relx = .5, rely = .5, anchor = 'center')
+    tk.Button(canvas, font = ("Times New Roman", 10), text = "Laser", fg = "red", bd = 3, command = onLaserToggle).place(relx = .5, rely = .45, anchor = 'center')
     tk.Button(canvas, font = ("Times New Roman", 10), text = "Exit", command = annihilation, fg = "red").place(relx = .5, anchor = 'n')
     positionLabel = tk.Label(canvas, font = ("Times New Roman", 7), text = f"X:{mouse_x}, Y:{mouse_y}", bg = "lightgray", fg = "red")
     positionLabel.place(anchor = 'nw')
@@ -80,7 +92,7 @@ async def tkinterUI(loop, send_queue):
                 my = r.randint(0, WINDOW_WIDTH)
                 await send_queue.put((mx, my))
             await asyncio.sleep(2.5)
-    
+
     return [tk_loop(), autoRunFunction()]
 
 #Connection to ESP32
