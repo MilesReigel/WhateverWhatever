@@ -14,10 +14,10 @@ laserOn = False
 client = None
 WINDOW_WIDTH = 500
 WINDOW_HEIGHT = 500
-SEND_INTERVAL_MS = 10
+SEND_INTERVAL_MS = 7
 
 #Everything in the UI
-async def tkinterUI(loop, send_queue):
+async def tkinterUI(send_queue):
     global programOn, laserOn
 
     #Notification Function for auto mode
@@ -28,7 +28,7 @@ async def tkinterUI(loop, send_queue):
             print("Auto Mode Disabled")
 
     #Exit Function
-    def annihilation():
+    def annihilation(*args):
         global programOn
         programOn = False
         print("Terminating Program")
@@ -38,9 +38,11 @@ async def tkinterUI(loop, send_queue):
     async def laserOnFunction():
         global programOn, laserOn
         if programOn:
-            await send_queue.put(WINDOW_WIDTH + 1, WINDOW_HEIGHT + 1)
+            Lx = WINDOW_WIDTH + 1
+            Ly = WINDOW_HEIGHT + 1
+            await send_queue.put((Lx, Ly))
             laserOn = not laserOn
-    def onLaserToggle():
+    def onLaserToggle(*args):
         asyncio.create_task(laserOnFunction())
     
     #Mouse Movement Handler
@@ -53,7 +55,6 @@ async def tkinterUI(loop, send_queue):
     root = tk.Tk()
     root.title("ESP32 Mouse Controller")
     root.geometry(f"{WINDOW_WIDTH}x{WINDOW_HEIGHT}")
-
     canvas = tk.Canvas(root, width=WINDOW_WIDTH, height=WINDOW_HEIGHT, bg="lightgray")
     canvas.pack()
     AutoRunTF = tk.BooleanVar()
@@ -62,9 +63,15 @@ async def tkinterUI(loop, send_queue):
     tk.Button(canvas, font = ("Times New Roman", 10), text = "Exit", command = annihilation, fg = "red").place(relx = .5, anchor = 'n')
     positionLabel = tk.Label(canvas, font = ("Times New Roman", 7), text = f"X:{mouse_x}, Y:{mouse_y}", bg = "lightgray", fg = "red")
     positionLabel.place(anchor = 'nw')
+    laserLabel = tk.Label(canvas, font = ("Times New Roman", 7), text = "Laser: OFF", bg = "lightgray", fg = "red")
+    laserLabel.place(anchor = "w", rely = .05)
     canvas.create_line(0, WINDOW_HEIGHT/2, WINDOW_WIDTH, WINDOW_HEIGHT/2, activewidth = 3)
     canvas.create_line(WINDOW_WIDTH/2, 0, WINDOW_WIDTH/2, WINDOW_HEIGHT, activewidth = 3)
+    
+    #Event handling
     canvas.bind("<Motion>", on_mouse_move)
+    root.bind("l", onLaserToggle)
+    #root.bind("<Escape>", annihilation)
     root.protocol("WM_DELETE_WINDOW", annihilation)
 
     #Update GUI loop
@@ -73,7 +80,13 @@ async def tkinterUI(loop, send_queue):
         while programOn:
             try:
                 root.update()
+                #Label Updates
                 positionLabel['text'] = f"X:{mouse_x}, Y:{WINDOW_HEIGHT - mouse_y}"
+                if laserOn:
+                    laserLabel['text'] = "Laser: ON"
+                else:
+                    laserLabel['text'] = "Laser: OFF"
+                #Mouse position queue updates
                 if not AutoRunTF.get():
                     if (abs(mouse_x - lastx) > 5  or abs(mouse_y - lasty) > 5):
                         await send_queue.put((mouse_x, mouse_y))
