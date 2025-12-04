@@ -21,7 +21,7 @@ async def tkinterUI(send_queue):
     global programOn, laserOn
 
     #Notification Function for auto mode
-    def AutoRunOnOff():
+    def AutoRunOnOff(*args):
         if AutoRunTF.get():
             print("Auto Mode Enabled")
         else: 
@@ -142,7 +142,7 @@ async def main():
         print("Connection error: ", e)
         return
     
-    tasks = await tkinterUI(asyncio.get_event_loop(), send_queue)
+    tasks = await tkinterUI(send_queue)
     #Sends Queue Data to Tx function
     await asyncio.gather(*tasks, send_mouse_data(client, send_queue))
 
