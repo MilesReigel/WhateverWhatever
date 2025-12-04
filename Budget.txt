@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 McDonald's~5~5~3
 Subway~6~6~2
 Starbucks~7~8~2
@@ -18,3 +19,5 @@ Sonic Drive-In~6~6~3
 Five Guys~8~8~2
 In-N-Out Burger~9~9~1
 Red Lobster~7~7~3
+=======
+>>>>>>> 20cd6f6ea6edf82c02724dbfe1a2e43f8e240200

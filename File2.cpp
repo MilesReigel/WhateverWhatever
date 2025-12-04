@@ -1,6 +1,8 @@
 #include <iostream>
+#include <string>
 #include <fstream>
 #include <iomanip>
+<<<<<<< HEAD
 using namespace std;
 
 struct Restaurant {
@@ -52,6 +54,42 @@ int readRestaurantDetails(string fname, Restaurant restaurant[], const int max_r
     }
     return(linecounter);
 }
+=======
+#include <cmath>
+
+using namespace std;
+
+struct Student {
+    string name;
+    int score;
+};
+
+void saveAndLoad() {
+    Student s1;
+
+    cout << "Initialize s1 name and score" << endl;
+    cin >> s1.name >> s1.score;
+
+    ofstream outFile("Student.txt");
+    
+    outFile << s1.name << " " << s1.score << endl;
+    outFile.close();
+
+    ifstream inFile("Student.txt");
+
+    if (!inFile) {
+        cout << "Failed to open file" << endl;
+    }
+
+    Student s2;
+    inFile >> s2.name >> s2.score;
+    inFile.close();
+}
+
+int main()
+{
+    saveAndLoad();
+>>>>>>> 20cd6f6ea6edf82c02724dbfe1a2e43f8e240200
 
 int getBest(Restaurant restaurants[], int size, string metric) {
     int bestMetric = 0, restaurant;
