@@ -1,6 +1,9 @@
 {
     "C_Cpp.errorSquiggles": "enabled",
     "files.associations": {
-        "iostream": "cpp"
+        "iostream": "cpp",
+        "text_encoding": "cpp",
+        "typeinfo": "cpp",
+        "ostream": "cpp"
     }
 }
