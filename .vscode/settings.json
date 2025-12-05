@@ -4,6 +4,8 @@
         "iostream": "cpp",
         "text_encoding": "cpp",
         "typeinfo": "cpp",
-        "ostream": "cpp"
+        "ostream": "cpp",
+        "string": "cpp",
+        "format": "cpp"
     }
 }
