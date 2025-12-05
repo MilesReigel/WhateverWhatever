@@ -1,11 +1,11 @@
 #include <iostream>
 #include <string>
 #include "Board.cpp"
-#include "Header3.h"
+#include "OtherHeader.cpp"
 
 using namespace std;
 
 int main() {
-    
+
     return(0);
 }

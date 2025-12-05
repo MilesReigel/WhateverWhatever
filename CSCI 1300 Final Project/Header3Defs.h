@@ -2,11 +2,17 @@
 #ifndef HEADER3D_H
 #define HEADER3D_H
 
-class Characters {
-public:
-    string availableCharacters[26]; 
+using namespace std;
 
-    void CharacterSelection();
+class Characters {
+private:
+    
+public:
+    Characters CharacterSelection(Characters p1, Characters p2);
+    string name;
+    string path;
+    int DiscoveryPoints, Exp, Acc, Eff, Ins;
+
 
 };
 
