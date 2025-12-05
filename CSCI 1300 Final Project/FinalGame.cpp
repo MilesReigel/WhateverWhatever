@@ -6,6 +6,6 @@
 using namespace std;
 
 int main() {
-    
+    cout << lineSlicing(3, 0);
     return(0);
 }

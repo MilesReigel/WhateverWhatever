@@ -5,18 +5,23 @@
 #include <string>
 
 //slice character file lines into usable data
-string lineSlicing(string line, int character, int data) {
-    fstream CFile("Characters.txt");
-    string array[5][6], line;
-    int barCount = 0, linecount = 0;
+string lineSlicing(int character, int data) {
+    fstream CharacterFile("Characters.txt");
+    if (CharacterFile.fail()) {
+        cout << "File failed to open" << endl;
+        exit(-1);
+    }
+    string array[6][6], line;
+    int linecount = 0;
 
-    while (getline(CFile, line)) {
-        for (int i = 0; i <= line.length(); i++) {
+    while (getline(CharacterFile, line)) {
+        int barCount = 0, length = line.length();
+        for (int i = 0; i < length; i++) {
             if (line[i] == '|') {
                 barCount++;
             }
             else {
-                array[linecount][barCount] += line[i];
+                array[linecount][barCount] = array[linecount][barCount].append(line.substr(i,1));
             }
         }
         linecount++;
@@ -25,11 +30,11 @@ string lineSlicing(string line, int character, int data) {
 }
 
 //prompt players to choose characters and display character stats
-Characters Characters::CharacterSelection(Characters p1, Characters p2) {
+void Characters::CharacterSelection(Characters p1, Characters p2) {
     
     cout << "Available characters:" << endl;
     string lines;
-    int counter = 0, intc1, intc2;
+    int intc1, intc2;
     //display character data here
     cout << "Player 1 character(type 1-5): ";
     cin >> intc1;
@@ -42,6 +47,7 @@ Characters Characters::CharacterSelection(Characters p1, Characters p2) {
     }
     cout << endl << "Character " << intc2 << " was chosen. Both players have chosen characters.";
 
-    //p1.name = 
+    p1.name = lineSlicing(intc1, 0);
+    p2.name = lineSlicing(intc2, 0);
     
 }
