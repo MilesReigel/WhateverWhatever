@@ -9,6 +9,7 @@ private:
     
 public:
     void CharacterSelection(Characters p1, Characters p2);
+    void CharacterSettings(Characters p1, Characters p2);
     string name;
     string path;
     int DiscoveryPoints, Exp, Acc, Eff, Ins;

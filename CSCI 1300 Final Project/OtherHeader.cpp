@@ -48,6 +48,7 @@ void Characters::CharacterSelection(Characters p1, Characters p2) {
     cout << endl << "Character " << intc2 << " was chosen. Both players have chosen characters.";
 
     p1.name = lineSlicing(intc1, 0);
-    p2.name = lineSlicing(intc2, 0);
-    
+    p2.name = lineSlicing(intc2, 0);    
 }
+
+void CharacterSettings(Characters p1, Characters p2);
