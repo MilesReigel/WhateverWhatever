@@ -4,17 +4,18 @@
 
 using namespace std;
 
-class Characters {
-private:
-    
+int Character1 = 0, Character2 = 0;
+int statMinimum = 100;
+
+class Characters { 
 public:
-    void CharacterSelection(Characters p1, Characters p2);
-    void CharacterSettings(Characters p1, Characters p2);
-    string name;
-    string path;
-    int DiscoveryPoints, Exp, Acc, Eff, Ins;
+    Characters(int character);
+    void PathSelection();
+    void PrintStats(int player);
 
-
+    string name, advisor;
+    int Dsp, Exp, Acc, Eff, Ins;
+    bool path;
 };
 
 #endif
