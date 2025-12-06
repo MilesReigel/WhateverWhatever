@@ -6,6 +6,7 @@
 #include <ctime>
 #include <iostream>
 #include <string>
+#include <windows.h>
 
 // Each of the following defines a macro
 // Essentially nicenames to use instead of the corresponding escape sequence ('\') 
@@ -148,6 +149,10 @@ bool Board::movePlayer(int player_index) {
     // Increment player position by 1
     _player_position[player_index]++;
 
+    if (((rand() % 4) == 2) && (_player_position[player_index] != (_BOARD_SIZE - 1))) {
+        //misfortune(player_index); figure out how to integrate these
+    }
+
     // Player reached last tile
     if (_player_position[player_index] == _BOARD_SIZE - 1) {
         return true;
@@ -161,4 +166,13 @@ int Board::getPlayerPosition(int player_index) const {
         return _player_position[player_index];
     }
     return -1;
+}
+
+int Board::RollDice(int player_index) {
+    int roll = rand() % 6;
+    cout << endl << "Player " << player_index << "has rolled!" << endl;
+    cout << "Rolling..." << endl;
+    Sleep(1000000);
+    cout << "Player " << player_index << "has rolled a " << roll;
+    return(roll);
 }

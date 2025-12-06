@@ -9,12 +9,15 @@ int statMinimum = 100;
 
 class Characters { 
 public:
-    Characters(int character);
-    void PathSelection();
+    Characters(int player, int character);
+    void PathSelection(int player);
     void PrintStats(int player);
+    void AdvisorSelection(int player);
+    void misfortune(int player);
+    
 
-    string name, advisor;
-    int Dsp, Exp, Acc, Eff, Ins;
+    string name;
+    int Dsp, Exp, Acc, Eff, Ins, number, advisor;
     bool path;
 };
 

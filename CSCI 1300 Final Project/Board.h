@@ -31,6 +31,8 @@ class Board {
         bool movePlayer(int player_index);
         // Recall we can use const for getter functions
         int getPlayerPosition(int player_index) const;
+
+        int RollDice(int player_index);
 };
 
 #endif
