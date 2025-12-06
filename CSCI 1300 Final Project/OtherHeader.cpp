@@ -148,7 +148,7 @@ void Characters::AdvisorSelection(int player) {
     cout << ". They will aid you on your journey to become the best genomist!" << endl << endl;
 }
 
-string riddles(int character, int riddlenum) {
+string riddles(int character, int riddlenum, bool riddleorans) {
     fstream RiddleFile("riddles.txt");
     if (RiddleFile.fail()) {
         cout << "File failed to open" << endl;
@@ -176,13 +176,18 @@ string riddles(int character, int riddlenum) {
         }
         linecounter++;
     }
-    return(riddle[0]);
+    if (riddleorans) {
+        return(riddle[0]);
+    }
+    else {
+        return(riddle[1]);
+    }
 }
 
 void Characters::misfortune(int player) {
     if ((rand() % 2) == 1) {
         int lineSelection = rand() % 25;
-        riddles(player, lineSelection);
+        //riddles(player, lineSelection, riddleorans);
     }
     else {
         if ((rand() % 2) == 2) {
