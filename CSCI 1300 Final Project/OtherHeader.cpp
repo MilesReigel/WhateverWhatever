@@ -4,8 +4,6 @@
 #include <fstream>
 #include <string>
 
-int second = 1000;
-
 //slice character file lines into usable data
 string lineSlicing(int character, int data) {
     fstream CharacterFile("Characters.txt");
@@ -61,17 +59,34 @@ Characters::Characters(int p, int c) {
     Eff = stoi(lineSlicing(c, 3));
     Ins = stoi(lineSlicing(c, 4));
     Dsp = 20000;
+    advisor = 0;
+    path = false;
 }
 
 //function to print character stats
-void Characters::PrintStats(int player) {
+void Characters::PrintStats(int player, int typeOfCall) {
     cout << endl << "Player " << player << " stats: " << endl;
     cout << "Name: " << name << endl;
-    cout << "Experience: " << Exp << endl;
-    cout << "Accuracy: " << Acc << endl;
-    cout << "Efficiency: " << Eff << endl;
-    cout << "Insight: " << Ins << endl;
-    cout << "Discovery Points: " << Dsp << endl << endl;
+    switch (typeOfCall) {
+        case 1:
+            cout << "Experience: " << Exp << endl;
+            cout << "Advisor: " << AdvisorPrinting(advisor) << endl;
+        case 2:
+            cout << "Accuracy: " << Acc << endl;
+            cout << "Efficiency: " << Eff << endl;
+            cout << "Insight: " << Ins << endl;
+            cout << "Discovery Points: " << Dsp << endl << endl;
+            break;
+        default:
+            cout << "Experience: " << Exp << endl;
+            cout << "Advisor: " << AdvisorPrinting(advisor) << endl;
+            cout << "Accuracy: " << Acc << endl;
+            cout << "Efficiency: " << Eff << endl;
+            cout << "Insight: " << Ins << endl;
+            cout << "Discovery Points: " << Dsp << endl << endl;
+    }
+    
+    
 }
 
 //player path selection function
@@ -98,7 +113,7 @@ void Characters::PathSelection(int player) {
         Ins += 1000;
         Dsp -= 5000;
         cout << "Your new stats are: " << endl;
-        PrintStats(player);
+        PrintStats(player, 3);
 
     }
     else {
@@ -108,10 +123,11 @@ void Characters::PathSelection(int player) {
         Ins += 200;
         Dsp += 5000;
         cout << "Your new stats are: " << endl;
-        PrintStats(player);
+        PrintStats(player, 3);
     }
 }
 
+//advisor selection
 void Characters::AdvisorSelection(int player) {
     cout << "Player " << player << " has chosen the Training Fellowship Path. This player must" << endl;
     cout << "now choose an advisor to guide them on their journey. The advisor options are as" << endl;
@@ -149,6 +165,29 @@ void Characters::AdvisorSelection(int player) {
     }
     cout << ". They will aid you on your journey to become the best genomist!" << endl << endl;
 }
+
+string Characters::AdvisorPrinting(int advisor) {
+    switch (advisor) {
+        case 1:
+            return("Aliquot, master of the \" wet lab\"");
+            break;
+        case 2:
+            return("Assembler, optimizer of pipelines");
+            break;
+        case 3:
+            return("Pop-Gen, a genetic-variant-identifying specialist");
+            break;
+        case 4:
+            return("Bio-Script, genius data analyst");
+            break;
+        case 5:
+            return("Loci, your friendly neighborhood equipment specialist");
+            break;
+        default:
+            return("N/A");
+    }
+}
+
 
 //riddle calling function
 string riddles(int riddlenum, bool riddleorans) {
@@ -256,5 +295,52 @@ void Characters::misfortune(int player) {
     //event
     else {
         events();
+    }
+}
+
+void turn(int player, Board BigB, Characters character) {
+    int choice;
+    cout << endl << "It is player " << player << "'s turn! choose one of the options below: " << endl;
+    cout << "1: Roll your dice to move forward" << endl;
+    cout << "2: Check your character stats" << endl;
+    cout << "3: Check board position" << endl;
+    cout << "4: Attempt to sabotage the other player" << endl;
+    cout << "5: Gamble?" << endl << endl;
+    cout << "Enter your choice: ";
+    cin >> choice;
+    switch (choice) {
+        case 1:
+            //ideally this can still modify class objeect variables like player position for bigb, we will see
+            BigB.movePlayer(BigB.RollDice(player));
+            break;
+        case 2:
+            cout << "Would you like to see Experience and Advisor(1) or Discovery Points and other stats(2)? " << endl;
+            cin >> choice;
+            if (choice == 1) {
+                character.PrintStats(player, 1);
+            }
+            else if (choice == 2) {
+                character.PrintStats(player, 2);
+            }
+            else {
+                cout << "That wasn't an option you goof" << endl;
+            }
+            turn(player, BigB, character);
+            break;
+        case 3:
+            BigB.displayBoard();
+            turn(player, BigB, character);
+            break;
+        case 4:
+
+            break;
+        case 5:
+
+            break;
+        default:
+            cout << "Invalid input, try that sh*t again chief" << endl;
+            turn(player, BigB, character);
+
+
     }
 }

@@ -7,6 +7,7 @@
 #include <iostream>
 #include <string>
 #include <windows.h>
+#include "Header3Defs.h"
 
 // Each of the following defines a macro
 // Essentially nicenames to use instead of the corresponding escape sequence ('\') 
