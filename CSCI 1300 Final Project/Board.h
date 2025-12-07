@@ -4,6 +4,7 @@
 #define BOARD_H
 
 #include "Tile.h"
+#include "Header3Defs.h"
 
 class Board {
     private:
@@ -31,8 +32,8 @@ class Board {
         bool movePlayer(int player_index);
         // Recall we can use const for getter functions
         int getPlayerPosition(int player_index) const;
-
-        int RollDice(int player_index);
+        void turn(int player_index, Characters character);
+        int RollDice();
 };
 
 #endif

@@ -6,7 +6,6 @@
 #include <ctime>
 #include <iostream>
 #include <string>
-#include <windows.h>
 #include "Header3Defs.h"
 
 // Each of the following defines a macro
@@ -169,11 +168,59 @@ int Board::getPlayerPosition(int player_index) const {
     return -1;
 }
 
-int Board::RollDice(int player_index) {
+int Board::RollDice() {
     int roll = (rand() % 6) + 1;
-    cout << endl << "Player " << player_index << "has rolled!" << endl;
-    cout << "Rolling..." << endl;
-    Sleep(second);
-    cout << "Player " << player_index << "has rolled a " << roll;
     return(roll);
+}
+
+void Board::turn(int player, Characters character) {
+    int choice, roll;
+    cout << endl << "It is player " << player << "'s turn! choose one of the options below: " << endl;
+    cout << "1: Roll your dice to move forward" << endl;
+    cout << "2: Check your character stats" << endl;
+    cout << "3: View Board" << endl;
+    cout << "4: Attempt to sabotage the other player" << endl;
+    cout << "5: Gamble?" << endl << endl;
+    cout << "Enter your choice: ";
+    cin >> choice;
+    switch (choice) {
+        case 1:
+            roll = RollDice();
+            cout << endl << "Player " << player << " has rolled!" << endl;
+            cout << "Rolling..." << endl;
+            Sleep(second);
+            cout << "Player " << player << " has rolled a " << roll << endl << endl;
+            for (int i = 0; i < roll; i++) {
+                movePlayer(player - 1);
+            }
+            displayBoard();
+            break;
+        case 2:
+            cout << "Would you like to see Experience and Advisor(1) or Discovery Points and other stats(2)? " << endl;
+            cin >> choice;
+            if (choice == 1) {
+                character.PrintStats(player, 1);
+            }
+            else if (choice == 2) {
+                character.PrintStats(player, 2);
+            }
+            else {
+                cout << "That wasn't an option you goof" << endl;
+            }
+            turn(player, character);
+            break;
+        case 3:
+            displayBoard();
+            turn(player, character);
+            break;
+        case 4:
+
+            break;
+        case 5:
+
+            break;
+        default:
+            cout << "Invalid input, try that sh*t again chief" << endl;
+            turn(player, character);
+    }
 }

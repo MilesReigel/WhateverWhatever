@@ -71,19 +71,21 @@ void Characters::PrintStats(int player, int typeOfCall) {
         case 1:
             cout << "Experience: " << Exp << endl;
             cout << "Advisor: " << AdvisorPrinting(advisor) << endl;
+            break;
         case 2:
             cout << "Accuracy: " << Acc << endl;
             cout << "Efficiency: " << Eff << endl;
             cout << "Insight: " << Ins << endl;
             cout << "Discovery Points: " << Dsp << endl << endl;
             break;
-        default:
+        case 3:
             cout << "Experience: " << Exp << endl;
             cout << "Advisor: " << AdvisorPrinting(advisor) << endl;
             cout << "Accuracy: " << Acc << endl;
             cout << "Efficiency: " << Eff << endl;
             cout << "Insight: " << Ins << endl;
             cout << "Discovery Points: " << Dsp << endl << endl;
+            break;
     }
     
     
@@ -277,7 +279,7 @@ void Characters::misfortune(int player) {
     //riddle
     if ((rand() % 2) == 1) {
         string answer;
-        cout << "player " << player << "must solve a riddle: " << endl << endl;
+        cout << "player " << player << " must solve a riddle: " << endl << endl;
         int lineSelection = rand() % 25;
         cout << riddles(lineSelection, true) << endl;
         cin >> answer;
@@ -298,49 +300,3 @@ void Characters::misfortune(int player) {
     }
 }
 
-void turn(int player, Board BigB, Characters character) {
-    int choice;
-    cout << endl << "It is player " << player << "'s turn! choose one of the options below: " << endl;
-    cout << "1: Roll your dice to move forward" << endl;
-    cout << "2: Check your character stats" << endl;
-    cout << "3: Check board position" << endl;
-    cout << "4: Attempt to sabotage the other player" << endl;
-    cout << "5: Gamble?" << endl << endl;
-    cout << "Enter your choice: ";
-    cin >> choice;
-    switch (choice) {
-        case 1:
-            //ideally this can still modify class objeect variables like player position for bigb, we will see
-            BigB.movePlayer(BigB.RollDice(player));
-            break;
-        case 2:
-            cout << "Would you like to see Experience and Advisor(1) or Discovery Points and other stats(2)? " << endl;
-            cin >> choice;
-            if (choice == 1) {
-                character.PrintStats(player, 1);
-            }
-            else if (choice == 2) {
-                character.PrintStats(player, 2);
-            }
-            else {
-                cout << "That wasn't an option you goof" << endl;
-            }
-            turn(player, BigB, character);
-            break;
-        case 3:
-            BigB.displayBoard();
-            turn(player, BigB, character);
-            break;
-        case 4:
-
-            break;
-        case 5:
-
-            break;
-        default:
-            cout << "Invalid input, try that sh*t again chief" << endl;
-            turn(player, BigB, character);
-
-
-    }
-}

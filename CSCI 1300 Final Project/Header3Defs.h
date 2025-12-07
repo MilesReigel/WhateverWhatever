@@ -1,4 +1,5 @@
 #include <string>
+#include <windows.h>
 #ifndef HEADER3D_H
 #define HEADER3D_H
 
