@@ -16,4 +16,10 @@ int main() {
     testP.PrintStats(1);
 
     testP.misfortune(1);
+
+    //test playloop
+    while ((BigB.getPlayerPosition(1) < 52) && (BigB.getPlayerPosition(2) < 52)) {
+        
+    }
+
 }

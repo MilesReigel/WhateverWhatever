@@ -4,6 +4,8 @@
 #include <fstream>
 #include <string>
 
+int second = 1000;
+
 //slice character file lines into usable data
 string lineSlicing(int character, int data) {
     fstream CharacterFile("Characters.txt");

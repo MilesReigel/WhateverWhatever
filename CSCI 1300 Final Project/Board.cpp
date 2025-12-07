@@ -172,7 +172,7 @@ int Board::RollDice(int player_index) {
     int roll = (rand() % 6) + 1;
     cout << endl << "Player " << player_index << "has rolled!" << endl;
     cout << "Rolling..." << endl;
-    Sleep(1000000);
+    Sleep(second);
     cout << "Player " << player_index << "has rolled a " << roll;
     return(roll);
 }
