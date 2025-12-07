@@ -11,7 +11,7 @@ string lineSlicing(int character, int data) {
         cout << "File failed to open" << endl;
         exit(-1);
     }
-    string array[6][6], line;
+    string array[7][6], line;
     int linecount = 0;
 
     while (getline(CharacterFile, line)) {
@@ -34,13 +34,13 @@ string lineSlicing(int character, int data) {
 void CharacterSelection() {
     
     cout << "Available characters:" << endl;
-    for (int i = 1; i < 6; i++) {
+    for (int i = 1; i < 7; i++) {
         cout << lineSlicing(i, 0) << endl;
     }
-    cout << "Player 1 character(type 1-5): ";
+    cout << "Player 1 character(type 1-6): ";
     cin >> Character1;
     cout << "Player 1 chose " << lineSlicing(Character1, 0) << ". They are no longer available for selection." << endl;
-    cout << "Player 2 character(type 1-5): ";
+    cout << "Player 2 character(type 1-6): ";
     cin >> Character2;
     //input validation may require more work
     if (Character2 == Character1) {
@@ -148,7 +148,8 @@ void Characters::AdvisorSelection(int player) {
     cout << ". They will aid you on your journey to become the best genomist!" << endl << endl;
 }
 
-string riddles(int character, int riddlenum, bool riddleorans) {
+//riddle calling function
+string riddles(int riddlenum, bool riddleorans) {
     fstream RiddleFile("riddles.txt");
     if (RiddleFile.fail()) {
         cout << "File failed to open" << endl;
@@ -160,7 +161,7 @@ string riddles(int character, int riddlenum, bool riddleorans) {
 
     while (getline(RiddleFile, line)) {
         int length = line.length();
-        if (linecounter == riddlenum - 1) {
+        if (linecounter == riddlenum) {
             for (int i = 0; i < length; i++) {
                 if (line[i] == '\r') continue;
                 if (line[i] == '|') {
@@ -184,17 +185,74 @@ string riddles(int character, int riddlenum, bool riddleorans) {
     }
 }
 
-void Characters::misfortune(int player) {
-    if ((rand() % 2) == 1) {
-        int lineSelection = rand() % 25;
-        //riddles(player, lineSelection, riddleorans);
+void Characters::events() {
+    int eventnum = rand() % 48;
+    fstream EventsFile("events.txt");
+    if (EventsFile.fail()) {
+        cout << "File failed to open" << endl;
+        exit(-1);
+    }
+    string event[4], line;
+    int linecounter = 0;
+
+    while (getline(EventsFile, line)) {
+        int length = line.length(), barcounter = 0;
+        if (linecounter == eventnum) {
+            for (int i = 0; i < length; i++) {
+                if (line[i] == '\r') continue;
+
+                if (line[i] == '|') {
+                    barcounter++;
+                }
+                else {
+                    event[barcounter] = event[barcounter].append(line.substr(i, 1));
+                }
+            }
+        }
+        linecounter++;
+    }
+
+    cout << event[0] << "." << endl;
+    if ((event[1] == "0") && (event[2] != "0") && (advisor == stoi(event[2]))) {
+        cout << "Your advisor has saved you from misfortune! Your Discovery Points live to see" << endl;
+        cout << "another day." << endl;
     }
     else {
-        if ((rand() % 2) == 2) {
-            //good event
+        if (stoi(event[3]) > 0) {
+            cout << "This is fortunate. + " << event[3] << " Discovery Points" << endl;
+            Dsp += stoi(event[3]);
         }
         else {
-            //bad event
+            cout << "This is unfortunate. Better luck next time! " << endl;
+            cout << event[3] << " Discovery Points" << endl;
+            Dsp += stoi(event[3]);
         }
+    }
+    
+}
+
+void Characters::misfortune(int player) {
+    cout << "A surprise event has struck player " << player << "!" << endl;
+    //riddle
+    if ((rand() % 2) == 1) {
+        string answer;
+        cout << "player " << player << "must solve a riddle: " << endl << endl;
+        int lineSelection = rand() % 25;
+        cout << riddles(lineSelection, true) << endl;
+        cin >> answer;
+        if (riddles(lineSelection, false) == answer) {
+            cout << "Wowie, you got it! That question was pretty easy though." << endl << "+500 Discovery Points" << endl;
+            Dsp += 500;
+        }
+        else {
+            cout << "Haha I bet you wish that were the answer! It's actually " << riddles(lineSelection, false) << endl;
+            cout << "You failed so badly that you get a penalty!" << endl;
+            cout << "-500 Discovery Points for not paying more attention in class" << endl;
+            Dsp -= 500;
+        }
+    }
+    //event
+    else {
+        events();
     }
 }

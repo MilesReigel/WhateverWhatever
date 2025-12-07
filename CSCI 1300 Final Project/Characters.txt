@@ -1,6 +1,7 @@
 playerName|experience|accuracy|efficiency|insight|discoveryPoints
-Dr.Leo|5|500|500|1000|20000
-Dr.Helix|8|900|600|600|20000
-Dr.Panthera|12|900|700|500|20000
-Dr.Adenine|7|600|500|900|20000
-Dr.K-mer|18|1000|500|500|20000
+Dr.Doofenshmirtz|20|300|1000|1100|20000
+Dr.House|16|900|600|600|20000
+Dr.Han|14|1100|700|700|20000
+Dr.Strange|17|1000|600|900|20000
+Dr.Doom|18|900|800|700|20000
+Dr.Seuss|17|500|500|1200|20000

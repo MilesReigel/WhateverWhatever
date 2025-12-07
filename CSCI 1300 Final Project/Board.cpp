@@ -169,7 +169,7 @@ int Board::getPlayerPosition(int player_index) const {
 }
 
 int Board::RollDice(int player_index) {
-    int roll = rand() % 6;
+    int roll = (rand() % 6) + 1;
     cout << endl << "Player " << player_index << "has rolled!" << endl;
     cout << "Rolling..." << endl;
     Sleep(1000000);

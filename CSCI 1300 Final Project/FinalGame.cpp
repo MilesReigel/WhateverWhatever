@@ -36,6 +36,6 @@ int main() {
     system("pause");
 
     BigB.displayBoard();
-
+    
     return(0);
 }

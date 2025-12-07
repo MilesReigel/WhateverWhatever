@@ -14,6 +14,7 @@ public:
     void PrintStats(int player);
     void AdvisorSelection(int player);
     void misfortune(int player);
+    void events();
     
 
     string name;
