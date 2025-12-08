@@ -168,13 +168,13 @@ int Board::getPlayerPosition(int player_index) const {
     return -1;
 }
 
-int Board::RollDice() {
-    int roll = (rand() % 6) + 1;
+int Board::RollDice(Characters character) {
+    int roll = (rand() % 6) + 1 ;
     return(roll);
 }
 
-void Board::turn(int player, Characters character) {
-    int choice, roll;
+void Board::turn(int player, Characters character, Characters p1, Characters p2) {
+    int choice, roll, sabotage;
     cout << endl << "It is player " << player << "'s turn! choose one of the options below: " << endl;
     cout << "1: Roll your dice to move forward" << endl;
     cout << "2: Check your character stats" << endl;
@@ -185,11 +185,23 @@ void Board::turn(int player, Characters character) {
     cin >> choice;
     switch (choice) {
         case 1:
-            roll = RollDice();
+            roll = RollDice(character);
             cout << endl << "Player " << player << " has rolled!" << endl;
             cout << "Rolling..." << endl;
+            if ((rand() % 20) == 6) {
+                cout << "(\"That's not what it does\")" << endl;
+            }
             Sleep(second);
-            cout << "Player " << player << " has rolled a " << roll << endl << endl;
+            if (character.trapAhead) {
+                roll -= 1;
+                cout << "The glue is sticky! You rolled a " << roll + 1 << " but you got a little stuck" << endl;
+                cout << "You only move " << roll << " tiles." << endl;
+                if (roll == 0) {cout << "(0 tiles? Are you kidding me? You must have really gotten stuck there.)" << endl;}
+                cout << endl;
+            }
+            else {
+                cout << "Player " << player << " has rolled a " << roll << endl << endl;
+            }
             for (int i = 0; i < roll; i++) {
                 movePlayer(player - 1);
             }
@@ -207,20 +219,94 @@ void Board::turn(int player, Characters character) {
             else {
                 cout << "That wasn't an option you goof" << endl;
             }
-            turn(player, character);
+            turn(player, character, p1, p2);
             break;
         case 3:
             displayBoard();
-            turn(player, character);
+            turn(player, character, p1, p2);
             break;
         case 4:
-
+            cout << "You have two options for your naerdowelling - you can either trap the path with Elmer's school glue and" << endl;
+            cout << "subtract one tile from you ropponent's next roll (type 1, with a 2 in 3 chance of success) " << endl;
+            cout << "or curse their next Discovery Point gain and take half of it for yourself (type 2, with a 1 in 2 chance of success): " << endl;
+            cin >> sabotage;
+            // trap
+            if (sabotage == 1) {
+                cout << "You attempt to trap the path..." << endl;
+                Sleep(second);
+                //fail
+                if ((rand() % 3) == 1) {
+                    cout << "They caught on to your trickery and know about the trap. Better luck next time." << endl;
+                }
+                //succeed
+                else {
+                    cout << "Your oppenent will surely be slowed down on their next roll." << endl;
+                    if (p1.name == character.name) {
+                        p2.trapAhead = true;
+                    }
+                    else {
+                        p1.trapAhead = true;
+                    }
+                }
+            }
+            //theft
+            else if (sabotage == 2) {
+                //fail
+                if ((rand() % 2) == 0) {
+                    cout << "The FBDPI (Federal Bureau of Discovery Point Investigation) sees your search history:" << endl;
+                    cout << "\"How to sabotage DP gain and take half of it for myself reddit\"" << endl << "\"How to ";
+                    cout << "steal someone else's discovery points easy tutorial \"" << endl << "You are on a watch list ";
+                    cout << "now. Maybe try searching with DuckDuckGo next time" << endl;
+                }
+                //succeed
+                else {
+                    cout << "You figure out how to take advantage of their work for your own gain. Effective? Yes." << endl;
+                    cout << "Morally wrong? Certainly. But clearly you don't care." << endl;
+                    cout << "Half of player ";
+                    if (player == 1) {
+                        cout << "2's ";
+                    }
+                    else {
+                        cout << "1's ";
+                    }
+                    cout << "next Discovery Point gain will go to you." << endl;
+                    character.theft = true;
+                }
+            }
             break;
         case 5:
-
+            cout << "Let's go gambling!" << endl;
+            cout << "This will cost you your turn. You have a 50/50 shot of earning or losing Discovery Points" << endl;
+            cout << "To follow the storyline here, let's say you're just trying random genetic mutations in your" << endl;
+            cout << "desperation to no longer be a failure. Are you sure you would like to proceed? (1 - yes, 2 - menu)" << endl;
+            cin >> choice;
+            // not gamble
+            if (choice == 2) {
+                cout << "The number one mistake new gamblers make is quitting before they win big. Remember that." << endl;
+                turn(player, character, p1, p2);
+            }
+            //gamble
+            else if (choice == 1) {
+                cout << "You made the right choice." << endl;
+                system("pause");
+                cout << "Let's see if luck is on your side." << endl;
+                system("pause");
+                cout << "A pause for dramatic effect... " << endl;
+                Sleep(second * 3);
+                if ((rand() % 2) == 1) {
+                    cout << "You won! You actually won! I never thought that would happen." << endl;
+                    cout << "+1000 Discovery Points!" << endl;
+                    DspAddition(player, 1000, p1, p2);
+                }
+                else {
+                    cout << "Aw dangit! You were so close. I'm sure you'll win next time though." << endl;
+                    cout << "-1000 Discovery Points" << endl;
+                    character.Dsp -= 1000;
+                }
+            }
             break;
         default:
             cout << "Invalid input, try that sh*t again chief" << endl;
-            turn(player, character);
+            // turn(player, character);
     }
 }

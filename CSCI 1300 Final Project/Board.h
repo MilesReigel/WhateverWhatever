@@ -6,6 +6,9 @@
 #include "Tile.h"
 #include "Header3Defs.h"
 
+int p1c = 0;
+int p2c = 1;
+
 class Board {
     private:
         // Static in this context: Belongs to the class, not each object
@@ -32,8 +35,8 @@ class Board {
         bool movePlayer(int player_index);
         // Recall we can use const for getter functions
         int getPlayerPosition(int player_index) const;
-        void turn(int player_index, Characters character);
-        int RollDice();
+        void turn(int player_index, Characters character, Characters p1, Characters p2);
+        int RollDice(Characters character);
 };
 
 #endif

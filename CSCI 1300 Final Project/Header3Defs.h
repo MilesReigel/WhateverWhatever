@@ -16,12 +16,14 @@ public:
     void PrintStats(int player, int typeOfCall);
     void AdvisorSelection(int player);
     string AdvisorPrinting(int advisor);
-    void misfortune(int player);
-    void events();    
+    void misfortune(int player, Characters p1, Characters p2);
+    void events(int player, Characters p1, Characters p2);    
 
     string name;
     int Dsp, Exp, Acc, Eff, Ins, number, advisor;
-    bool path;
+    bool path, theft, trapAhead;
 };
+
+void DspAddition(int player, int amount, Characters p1, Characters p2);
 
 #endif

@@ -61,6 +61,8 @@ Characters::Characters(int p, int c) {
     Dsp = 20000;
     advisor = 0;
     path = false;
+    theft = false;
+    trapAhead = false;
 }
 
 //function to print character stats
@@ -91,7 +93,7 @@ void Characters::PrintStats(int player, int typeOfCall) {
     
 }
 
-//player path selection function
+//player path selection
 void Characters::PathSelection(int player) {
     int pathChoice;
     cout << "Both players must now choose a path. This will determine the course of the game." << endl;
@@ -168,6 +170,7 @@ void Characters::AdvisorSelection(int player) {
     cout << ". They will aid you on your journey to become the best genomist!" << endl << endl;
 }
 
+//advisor printing
 string Characters::AdvisorPrinting(int advisor) {
     switch (advisor) {
         case 1:
@@ -190,8 +193,7 @@ string Characters::AdvisorPrinting(int advisor) {
     }
 }
 
-
-//riddle calling function
+//riddle calling
 string riddles(int riddlenum, bool riddleorans) {
     fstream RiddleFile("riddles.txt");
     if (RiddleFile.fail()) {
@@ -228,7 +230,8 @@ string riddles(int riddlenum, bool riddleorans) {
     }
 }
 
-void Characters::events() {
+//event calling
+void Characters::events(int player, Characters p1, Characters p2) {
     int eventnum = rand() % 48;
     fstream EventsFile("events.txt");
     if (EventsFile.fail()) {
@@ -263,7 +266,7 @@ void Characters::events() {
     else {
         if (stoi(event[3]) > 0) {
             cout << "This is fortunate. + " << event[3] << " Discovery Points" << endl;
-            Dsp += stoi(event[3]);
+            DspAddition(player, stoi(event[3]), p1, p2);
         }
         else {
             cout << "This is unfortunate. Better luck next time! " << endl;
@@ -271,10 +274,10 @@ void Characters::events() {
             Dsp += stoi(event[3]);
         }
     }
-    
 }
 
-void Characters::misfortune(int player) {
+//decide riddle or event
+void Characters::misfortune(int player, Characters p1, Characters p2) {
     cout << "A surprise event has struck player " << player << "!" << endl;
     //riddle
     if ((rand() % 2) == 1) {
@@ -285,7 +288,7 @@ void Characters::misfortune(int player) {
         cin >> answer;
         if (riddles(lineSelection, false) == answer) {
             cout << "Wowie, you got it! That question was pretty easy though." << endl << "+500 Discovery Points" << endl;
-            Dsp += 500;
+            DspAddition(player, 500, p1, p2);
         }
         else {
             cout << "Haha I bet you wish that were the answer! It's actually " << riddles(lineSelection, false) << endl;
@@ -296,7 +299,31 @@ void Characters::misfortune(int player) {
     }
     //event
     else {
-        events();
+        events(player, p1, p2);
+    }
+}
+
+//Discovery Point addition (for optional theft)
+void DspAddition(int player, int amount, Characters p1, Characters p2){
+    if (p1.theft && player == 2) {
+        cout << "Your sworn enemy has managed to steal half of your beautiful Discovery Point earnings!" << endl;
+        p1.Dsp += amount/2;
+        p2.Dsp += amount/2;
+        p1.theft = false;
+    }
+    else if (p2.theft && player == 1) {
+        cout << "Your sworn enemy has managed to steal half of your beautiful Discovery Point earnings!" << endl;
+        p1.Dsp += amount/2;
+        p2.Dsp += amount/2;
+        p2.theft = false;
+    }
+    else {
+        if (player == 1) {
+            p1.Dsp += amount;
+        }
+        else {
+            p2.Dsp += amount;
+        }
     }
 }
 
