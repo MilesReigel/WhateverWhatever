@@ -87,10 +87,11 @@ void Characters::PrintStats(int player, int typeOfCall) {
             cout << "Efficiency: " << Eff << endl;
             cout << "Insight: " << Ins << endl;
             cout << "Discovery Points: " << Dsp << endl << endl;
+            cout << "Trap Ahead: " << trapAhead << endl;
+            cout << "Theft: " << theft << endl;
+
             break;
     }
-    
-    
 }
 
 //player path selection

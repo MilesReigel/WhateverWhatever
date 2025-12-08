@@ -4,7 +4,7 @@
 #define BOARD_H
 
 #include "Tile.h"
-#include "Header3Defs.h"
+#include "OtherHeader.cpp"
 
 int p1c = 0;
 int p2c = 1;
@@ -27,7 +27,9 @@ class Board {
 
     public:
         // Default Constructor
-        Board();
+        Board();    
+
+        Characters p1, p2;
 
         void initializeBoard();
         void displayTrack(int player_index);

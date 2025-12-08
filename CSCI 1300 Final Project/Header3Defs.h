@@ -11,6 +11,7 @@ int second = 1000;
 
 class Characters { 
 public:
+    Characters();
     Characters(int player, int character);
     void PathSelection(int player);
     void PrintStats(int player, int typeOfCall);

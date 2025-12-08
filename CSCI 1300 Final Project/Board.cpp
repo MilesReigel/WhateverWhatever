@@ -174,7 +174,7 @@ int Board::RollDice(Characters character) {
 }
 
 void Board::turn(int player, Characters character, Characters p1, Characters p2) {
-    int choice, roll, sabotage;
+    int choice, roll;
     cout << endl << "It is player " << player << "'s turn! choose one of the options below: " << endl;
     cout << "1: Roll your dice to move forward" << endl;
     cout << "2: Check your character stats" << endl;
@@ -192,6 +192,7 @@ void Board::turn(int player, Characters character, Characters p1, Characters p2)
                 cout << "(\"That's not what it does\")" << endl;
             }
             Sleep(second);
+            character.PrintStats(player, 3);
             if (character.trapAhead) {
                 roll -= 1;
                 cout << "The glue is sticky! You rolled a " << roll + 1 << " but you got a little stuck" << endl;
@@ -229,9 +230,9 @@ void Board::turn(int player, Characters character, Characters p1, Characters p2)
             cout << "You have two options for your naerdowelling - you can either trap the path with Elmer's school glue and" << endl;
             cout << "subtract one tile from you ropponent's next roll (type 1, with a 2 in 3 chance of success) " << endl;
             cout << "or curse their next Discovery Point gain and take half of it for yourself (type 2, with a 1 in 2 chance of success): " << endl;
-            cin >> sabotage;
+            cin >> choice;
             // trap
-            if (sabotage == 1) {
+            if (choice == 1) {
                 cout << "You attempt to trap the path..." << endl;
                 Sleep(second);
                 //fail
@@ -243,14 +244,16 @@ void Board::turn(int player, Characters character, Characters p1, Characters p2)
                     cout << "Your oppenent will surely be slowed down on their next roll." << endl;
                     if (p1.name == character.name) {
                         p2.trapAhead = true;
+                        cout << "p2.trap set" << endl;
                     }
                     else {
                         p1.trapAhead = true;
+                        cout << "p1.trap set" << endl;
                     }
                 }
             }
             //theft
-            else if (sabotage == 2) {
+            else if (choice == 2) {
                 //fail
                 if ((rand() % 2) == 0) {
                     cout << "The FBDPI (Federal Bureau of Discovery Point Investigation) sees your search history:" << endl;
