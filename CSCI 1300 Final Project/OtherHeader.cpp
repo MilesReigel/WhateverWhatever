@@ -121,10 +121,11 @@ Characters::Characters() {
     path = false;
     theft = false;
     trapAhead = false;
+    index = -1;
 }
 
 //constructor to initialize variables based on character choice
-Characters::Characters(int p, int c) {
+Characters::Characters(int p, int c, int i) {
     name = lineSlicing(c, 0);
     number = p;
     Exp = stoi(lineSlicing(c, 1));
@@ -136,16 +137,17 @@ Characters::Characters(int p, int c) {
     path = false;
     theft = false;
     trapAhead = false;
+    index = i;
 }
 
 //function to print character stats
-void Characters::PrintStats(int player, int typeOfCall) {
-    cout << endl << "Player " << player << " stats: " << endl;
+void Characters::PrintStats(int typeOfCall) {
+    cout << endl << "Player " << index + 1 << " stats: " << endl;
     cout << "Name: " << name << endl;
     switch (typeOfCall) {
         case 1:
             cout << "Experience: " << Exp << endl;
-            cout << "Advisor: " << AdvisorPrinting(advisor) << endl;
+            cout << "Advisor: Dr. " << AdvisorPrinting(advisor) << endl;
             break;
         case 2:
             cout << "Accuracy: " << Acc << endl;
@@ -155,14 +157,13 @@ void Characters::PrintStats(int player, int typeOfCall) {
             break;
         case 3:
             cout << "Experience: " << Exp << endl;
-            cout << "Advisor: " << AdvisorPrinting(advisor) << endl;
+            cout << "Advisor: Dr. " << AdvisorPrinting(advisor) << endl;
             cout << "Accuracy: " << Acc << endl;
             cout << "Efficiency: " << Eff << endl;
             cout << "Insight: " << Ins << endl;
             cout << "Discovery Points: " << Dsp << endl << endl;
             cout << "Trap Ahead: " << trapAhead << endl;
             cout << "Theft: " << theft << endl;
-
             break;
     }
 }
@@ -191,7 +192,7 @@ void Characters::PathSelection(int player) {
         Ins += 1000;
         Dsp -= 5000;
         cout << "Your new stats are: " << endl;
-        PrintStats(player, 3);
+        PrintStats(3);
 
     }
     else {
@@ -201,7 +202,7 @@ void Characters::PathSelection(int player) {
         Ins += 200;
         Dsp += 5000;
         cout << "Your new stats are: " << endl;
-        PrintStats(player, 3);
+        PrintStats(3);
     }
 }
 

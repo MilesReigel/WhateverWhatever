@@ -17,13 +17,13 @@ int second = 1000;
 class Characters { 
 public:
     Characters();
-    Characters(int player, int character);
+    Characters(int player, int character, int index);
     void PathSelection(int player);
-    void PrintStats(int player, int typeOfCall);
+    void PrintStats(int typeOfCall);
     void AdvisorSelection(int player);    
 
     std::string name;
-    int Dsp, Exp, Acc, Eff, Ins, number, advisor;
+    int Dsp, Exp, Acc, Eff, Ins, number, advisor, index;
     bool path, theft, trapAhead;
 };
 

@@ -211,10 +211,10 @@ void Board::turn(int player) {
             cout << "Would you like to see Experience and Advisor(1) or Discovery Points and other stats(2)? " << endl;
             cin >> choice;
             if (choice == 1) {
-                active.PrintStats(player, 1);
+                active.PrintStats(1);
             }
             else if (choice == 2) {
-                opponent.PrintStats(player, 2);
+                opponent.PrintStats(2);
             }
             else {
                 cout << "That wasn't an option you goof" << endl;
