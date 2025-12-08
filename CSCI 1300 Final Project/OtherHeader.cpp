@@ -122,6 +122,7 @@ Characters::Characters() {
     theft = false;
     trapAhead = false;
     index = -1;
+    finished = false;
 }
 
 //constructor to initialize variables based on character choice

@@ -24,7 +24,7 @@ public:
 
     std::string name;
     int Dsp, Exp, Acc, Eff, Ins, number, advisor, index;
-    bool path, theft, trapAhead;
+    bool path, theft, trapAhead, finished;
 };
 
 class Board {
@@ -60,6 +60,8 @@ class Board {
         void misfortune(int player); // this
         void events(int player); // this
         void DspAddition(int player, int amount); // this
+
+        void Victory(int player_index);
 };
 
 #endif
