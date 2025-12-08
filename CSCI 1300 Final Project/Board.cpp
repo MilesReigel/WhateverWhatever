@@ -147,7 +147,7 @@ bool Board::movePlayer(int player_index) {
     _player_position[player_index]++;
 
     if (((rand() % 4) == 2) && (_player_position[player_index] != (_BOARD_SIZE - 1))) {
-        //misfortune(player_index); figure out how to integrate these
+        misfortune(player_index + 1);
     }
 
     // Player reached last tile
@@ -172,7 +172,6 @@ int Board::RollDice() {
 
 void Board::turn(int player) {
     Characters &active = (player == 1) ? p1 : p2;
-    Characters &opponent = (player == 1) ? p2 : p1;
 
     int choice, roll;
     cout << endl << "It is player " << player << "'s turn! choose one of the options below: " << endl;
@@ -203,7 +202,9 @@ void Board::turn(int player) {
                 cout << "Player " << player << " has rolled a " << roll << endl << endl;
             }
             for (int i = 0; i < roll; i++) {
-                movePlayer(player - 1);
+                if(movePlayer(player - 1)) {
+                    Victory(player - 1);
+                }
             }
             displayBoard();
             break;
@@ -214,7 +215,7 @@ void Board::turn(int player) {
                 active.PrintStats(1);
             }
             else if (choice == 2) {
-                opponent.PrintStats(2);
+                active.PrintStats(2);
             }
             else {
                 cout << "That wasn't an option you goof" << endl;
@@ -408,4 +409,19 @@ void Board::DspAddition(int player, int amount){
             p2.Dsp += amount;
         }
     }
+}
+
+void Board::Victory(int player_index) {
+    int player = player_index + 1;
+    Characters &active = (player == 1) ? p1 : p2;
+    Characters &opponent = (player == 1) ? p2 : p1;
+    active.finished = true;
+    cout << "Player " << player << " has completed the game!" << endl;
+    if (active.finished && opponent.finished) {
+        cout << "Both Players have completed the game!" << endl;
+    }
+    else if (active.finished && !opponent.finished) {
+        cout << "Player " << player << " has won! Congratulations. Player " << opponent.index + 1 << " must now complete the game." << endl;
+    }
+    exit(0);
 }

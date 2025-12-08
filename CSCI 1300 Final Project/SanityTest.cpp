@@ -31,14 +31,10 @@ int main() {
         if (BigB.getPlayerPosition(p1c) < 52) {
             BigB.turn(1);
         }
-        BigB.p1.PrintStats(3);
-        BigB.p2.PrintStats(3);
         //if player 2 not finished
         if (BigB.getPlayerPosition(p2c) < 52) {
             BigB.turn(2);
         }
-        BigB.p2.PrintStats(3);
-        BigB.p2.PrintStats(3);
     }
 
 }

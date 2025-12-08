@@ -1,15 +1,13 @@
 #include <iostream>
 #include <string>
 #include "Board.cpp"
-#include "OtherHeader.cpp"
 
 using namespace std;
 
 int main() {
-    //initialize board & random seed
     Board BigB;
     srand(time(NULL));
-    //choose characters
+
     CharacterSelection();
     Characters temp1(1, Character1, 0);
     Characters temp2(2, Character2, 1);
@@ -18,7 +16,6 @@ int main() {
 
     system ("pause");
 
-    //choose path
     BigB.p1.PathSelection(BigB.p1.number);
     if (BigB.p1.path == true) {
         BigB.p1.AdvisorSelection(BigB.p1.number);
@@ -41,7 +38,21 @@ int main() {
     BigB.p1.PrintStats(2);
     BigB.p2.PrintStats(2);
 
-    
+    system("pause");
+
+    while ((BigB.getPlayerPosition(p1c) < 52) || (BigB.getPlayerPosition(p2c) < 52)) {
+        //if player 1 not finished
+        if (BigB.getPlayerPosition(p1c) < 52) {
+            BigB.turn(1);
+        }
+        else {
+
+        }
+        //if player 2 not finished
+        if (BigB.getPlayerPosition(p2c) < 52) {
+            BigB.turn(2);
+        }
+    }
     
     return(0);
 }
