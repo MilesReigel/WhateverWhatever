@@ -3,11 +3,29 @@
 #ifndef BOARD_H
 #define BOARD_H
 
+#include <string>
 #include "Tile.h"
-#include "OtherHeader.cpp"
+using std::string;
 
 int p1c = 0;
 int p2c = 1;
+
+int Character1 = 0, Character2 = 0;
+int statMinimum = 100;
+int second = 1000;
+
+class Characters { 
+public:
+    Characters();
+    Characters(int player, int character);
+    void PathSelection(int player);
+    void PrintStats(int player, int typeOfCall);
+    void AdvisorSelection(int player);    
+
+    std::string name;
+    int Dsp, Exp, Acc, Eff, Ins, number, advisor;
+    bool path, theft, trapAhead;
+};
 
 class Board {
     private:
@@ -37,8 +55,11 @@ class Board {
         bool movePlayer(int player_index);
         // Recall we can use const for getter functions
         int getPlayerPosition(int player_index) const;
-        void turn(int player_index, Characters character, Characters p1, Characters p2);
-        int RollDice(Characters character);
+        void turn(int player_index);
+        int RollDice();
+        void misfortune(int player); // this
+        void events(int player); // this
+        void DspAddition(int player, int amount); // this
 };
 
 #endif

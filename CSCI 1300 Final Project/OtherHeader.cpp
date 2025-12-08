@@ -1,10 +1,10 @@
 #include "Board.h"
-#include "Header3Defs.h"
 #include <iostream>
 #include <fstream>
 #include <string>
 
-//slice character file lines into usable data
+using namespace std;
+
 string lineSlicing(int character, int data) {
     fstream CharacterFile("Characters.txt");
     if (CharacterFile.fail()) {
@@ -30,6 +30,64 @@ string lineSlicing(int character, int data) {
     return(array[character][data]);
 }
 
+string AdvisorPrinting(int advisor) {
+    switch (advisor) {
+        case 1:
+            return("Aliquot, master of the \" wet lab\"");
+            break;
+        case 2:
+            return("Assembler, optimizer of pipelines");
+            break;
+        case 3:
+            return("Pop-Gen, a genetic-variant-identifying specialist");
+            break;
+        case 4:
+            return("Bio-Script, genius data analyst");
+            break;
+        case 5:
+            return("Loci, your friendly neighborhood equipment specialist");
+            break;
+        default:
+            return("N/A");
+    }
+}
+
+string riddles(int riddlenum, bool riddleorans) {
+    fstream RiddleFile("riddles.txt");
+    if (RiddleFile.fail()) {
+        cout << "File failed to open" << endl;
+        exit(-1);
+    }
+    string riddle[2], line;
+    int linecounter = 0;
+    bool passed = false;
+
+    while (getline(RiddleFile, line)) {
+        int length = line.length();
+        if (linecounter == riddlenum) {
+            for (int i = 0; i < length; i++) {
+                if (line[i] == '\r') continue;
+                if (line[i] == '|') {
+                    passed = true;
+                }
+                else if (!passed){
+                    riddle[0] = riddle[0].append(line.substr(i, 1));
+                }
+                else {
+                    riddle[1] = riddle[1].append(line.substr(i, 1));
+                }
+            }
+        }
+        linecounter++;
+    }
+    if (riddleorans) {
+        return(riddle[0]);
+    }
+    else {
+        return(riddle[1]);
+    }
+}
+
 //prompt players to choose characters and display character stats
 void CharacterSelection() {
     
@@ -48,6 +106,21 @@ void CharacterSelection() {
         cin >> Character2;
     }
     cout << "Player 2 chose " << lineSlicing(Character2, 0) << ". Both players have chosen characters." << endl << endl;
+}
+
+//default constructor
+Characters::Characters() {
+    name = "";
+    number = 0;
+    Exp = 0;
+    Acc = 0;
+    Eff = 0;
+    Ins = 0;
+    Dsp = 20000;
+    advisor = 0;
+    path = false;
+    theft = false;
+    trapAhead = false;
 }
 
 //constructor to initialize variables based on character choice
@@ -169,162 +242,5 @@ void Characters::AdvisorSelection(int player) {
             break;
     }
     cout << ". They will aid you on your journey to become the best genomist!" << endl << endl;
-}
-
-//advisor printing
-string Characters::AdvisorPrinting(int advisor) {
-    switch (advisor) {
-        case 1:
-            return("Aliquot, master of the \" wet lab\"");
-            break;
-        case 2:
-            return("Assembler, optimizer of pipelines");
-            break;
-        case 3:
-            return("Pop-Gen, a genetic-variant-identifying specialist");
-            break;
-        case 4:
-            return("Bio-Script, genius data analyst");
-            break;
-        case 5:
-            return("Loci, your friendly neighborhood equipment specialist");
-            break;
-        default:
-            return("N/A");
-    }
-}
-
-//riddle calling
-string riddles(int riddlenum, bool riddleorans) {
-    fstream RiddleFile("riddles.txt");
-    if (RiddleFile.fail()) {
-        cout << "File failed to open" << endl;
-        exit(-1);
-    }
-    string riddle[2], line;
-    int linecounter = 0;
-    bool passed = false;
-
-    while (getline(RiddleFile, line)) {
-        int length = line.length();
-        if (linecounter == riddlenum) {
-            for (int i = 0; i < length; i++) {
-                if (line[i] == '\r') continue;
-                if (line[i] == '|') {
-                    passed = true;
-                }
-                else if (!passed){
-                    riddle[0] = riddle[0].append(line.substr(i, 1));
-                }
-                else {
-                    riddle[1] = riddle[1].append(line.substr(i, 1));
-                }
-            }
-        }
-        linecounter++;
-    }
-    if (riddleorans) {
-        return(riddle[0]);
-    }
-    else {
-        return(riddle[1]);
-    }
-}
-
-//event calling
-void Characters::events(int player, Characters p1, Characters p2) {
-    int eventnum = rand() % 48;
-    fstream EventsFile("events.txt");
-    if (EventsFile.fail()) {
-        cout << "File failed to open" << endl;
-        exit(-1);
-    }
-    string event[4], line;
-    int linecounter = 0;
-
-    while (getline(EventsFile, line)) {
-        int length = line.length(), barcounter = 0;
-        if (linecounter == eventnum) {
-            for (int i = 0; i < length; i++) {
-                if (line[i] == '\r') continue;
-
-                if (line[i] == '|') {
-                    barcounter++;
-                }
-                else {
-                    event[barcounter] = event[barcounter].append(line.substr(i, 1));
-                }
-            }
-        }
-        linecounter++;
-    }
-
-    cout << event[0] << "." << endl;
-    if ((event[1] == "0") && (event[2] != "0") && (advisor == stoi(event[2]))) {
-        cout << "Your advisor has saved you from misfortune! Your Discovery Points live to see" << endl;
-        cout << "another day." << endl;
-    }
-    else {
-        if (stoi(event[3]) > 0) {
-            cout << "This is fortunate. + " << event[3] << " Discovery Points" << endl;
-            DspAddition(player, stoi(event[3]), p1, p2);
-        }
-        else {
-            cout << "This is unfortunate. Better luck next time! " << endl;
-            cout << event[3] << " Discovery Points" << endl;
-            Dsp += stoi(event[3]);
-        }
-    }
-}
-
-//decide riddle or event
-void Characters::misfortune(int player, Characters p1, Characters p2) {
-    cout << "A surprise event has struck player " << player << "!" << endl;
-    //riddle
-    if ((rand() % 2) == 1) {
-        string answer;
-        cout << "player " << player << " must solve a riddle: " << endl << endl;
-        int lineSelection = rand() % 25;
-        cout << riddles(lineSelection, true) << endl;
-        cin >> answer;
-        if (riddles(lineSelection, false) == answer) {
-            cout << "Wowie, you got it! That question was pretty easy though." << endl << "+500 Discovery Points" << endl;
-            DspAddition(player, 500, p1, p2);
-        }
-        else {
-            cout << "Haha I bet you wish that were the answer! It's actually " << riddles(lineSelection, false) << endl;
-            cout << "You failed so badly that you get a penalty!" << endl;
-            cout << "-500 Discovery Points for not paying more attention in class" << endl;
-            Dsp -= 500;
-        }
-    }
-    //event
-    else {
-        events(player, p1, p2);
-    }
-}
-
-//Discovery Point addition (for optional theft)
-void DspAddition(int player, int amount, Characters p1, Characters p2){
-    if (p1.theft && player == 2) {
-        cout << "Your sworn enemy has managed to steal half of your beautiful Discovery Point earnings!" << endl;
-        p1.Dsp += amount/2;
-        p2.Dsp += amount/2;
-        p1.theft = false;
-    }
-    else if (p2.theft && player == 1) {
-        cout << "Your sworn enemy has managed to steal half of your beautiful Discovery Point earnings!" << endl;
-        p1.Dsp += amount/2;
-        p2.Dsp += amount/2;
-        p2.theft = false;
-    }
-    else {
-        if (player == 1) {
-            p1.Dsp += amount;
-        }
-        else {
-            p2.Dsp += amount;
-        }
-    }
 }
 

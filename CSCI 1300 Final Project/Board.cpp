@@ -1,12 +1,9 @@
-// Source file calling the header file
 #include "Board.h"
-// Recall we use this preprocessor directive for rand() and srand()
 #include <cstdlib>
-// Similarly, we use this one for time() (The seed for random)
 #include <ctime>
 #include <iostream>
-#include <string>
-#include "Header3Defs.h"
+#include "OtherHeader.cpp"
+
 
 // Each of the following defines a macro
 // Essentially nicenames to use instead of the corresponding escape sequence ('\') 
@@ -168,12 +165,15 @@ int Board::getPlayerPosition(int player_index) const {
     return -1;
 }
 
-int Board::RollDice(Characters character) {
+int Board::RollDice() {
     int roll = (rand() % 6) + 1 ;
     return(roll);
 }
 
-void Board::turn(int player, Characters character, Characters p1, Characters p2) {
+void Board::turn(int player) {
+    Characters &active = (player == 1) ? p1 : p2;
+    Characters &opponent = (player == 1) ? p2 : p1;
+
     int choice, roll;
     cout << endl << "It is player " << player << "'s turn! choose one of the options below: " << endl;
     cout << "1: Roll your dice to move forward" << endl;
@@ -185,15 +185,14 @@ void Board::turn(int player, Characters character, Characters p1, Characters p2)
     cin >> choice;
     switch (choice) {
         case 1:
-            roll = RollDice(character);
+            roll = RollDice();
             cout << endl << "Player " << player << " has rolled!" << endl;
             cout << "Rolling..." << endl;
             if ((rand() % 20) == 6) {
                 cout << "(\"That's not what it does\")" << endl;
             }
-            Sleep(second);
-            character.PrintStats(player, 3);
-            if (character.trapAhead) {
+            // Sleep(second);
+            if (active.trapAhead) {
                 roll -= 1;
                 cout << "The glue is sticky! You rolled a " << roll + 1 << " but you got a little stuck" << endl;
                 cout << "You only move " << roll << " tiles." << endl;
@@ -212,19 +211,19 @@ void Board::turn(int player, Characters character, Characters p1, Characters p2)
             cout << "Would you like to see Experience and Advisor(1) or Discovery Points and other stats(2)? " << endl;
             cin >> choice;
             if (choice == 1) {
-                character.PrintStats(player, 1);
+                active.PrintStats(player, 1);
             }
             else if (choice == 2) {
-                character.PrintStats(player, 2);
+                opponent.PrintStats(player, 2);
             }
             else {
                 cout << "That wasn't an option you goof" << endl;
             }
-            turn(player, character, p1, p2);
+            turn(player);
             break;
         case 3:
             displayBoard();
-            turn(player, character, p1, p2);
+            turn(player);
             break;
         case 4:
             cout << "You have two options for your naerdowelling - you can either trap the path with Elmer's school glue and" << endl;
@@ -234,7 +233,7 @@ void Board::turn(int player, Characters character, Characters p1, Characters p2)
             // trap
             if (choice == 1) {
                 cout << "You attempt to trap the path..." << endl;
-                Sleep(second);
+                // Sleep(second);
                 //fail
                 if ((rand() % 3) == 1) {
                     cout << "They caught on to your trickery and know about the trap. Better luck next time." << endl;
@@ -242,7 +241,7 @@ void Board::turn(int player, Characters character, Characters p1, Characters p2)
                 //succeed
                 else {
                     cout << "Your oppenent will surely be slowed down on their next roll." << endl;
-                    if (p1.name == character.name) {
+                    if (p1.name == active.name) {
                         p2.trapAhead = true;
                         cout << "p2.trap set" << endl;
                     }
@@ -273,7 +272,7 @@ void Board::turn(int player, Characters character, Characters p1, Characters p2)
                         cout << "1's ";
                     }
                     cout << "next Discovery Point gain will go to you." << endl;
-                    character.theft = true;
+                    active.theft = true;
                 }
             }
             break;
@@ -286,7 +285,7 @@ void Board::turn(int player, Characters character, Characters p1, Characters p2)
             // not gamble
             if (choice == 2) {
                 cout << "The number one mistake new gamblers make is quitting before they win big. Remember that." << endl;
-                turn(player, character, p1, p2);
+                turn(player);
             }
             //gamble
             else if (choice == 1) {
@@ -295,21 +294,118 @@ void Board::turn(int player, Characters character, Characters p1, Characters p2)
                 cout << "Let's see if luck is on your side." << endl;
                 system("pause");
                 cout << "A pause for dramatic effect... " << endl;
-                Sleep(second * 3);
+                // Sleep(second * 3);
                 if ((rand() % 2) == 1) {
                     cout << "You won! You actually won! I never thought that would happen." << endl;
                     cout << "+1000 Discovery Points!" << endl;
-                    DspAddition(player, 1000, p1, p2);
+                    DspAddition(player, 1000);
                 }
                 else {
                     cout << "Aw dangit! You were so close. I'm sure you'll win next time though." << endl;
                     cout << "-1000 Discovery Points" << endl;
-                    character.Dsp -= 1000;
+                    active.Dsp -= 1000;
                 }
             }
             break;
         default:
             cout << "Invalid input, try that sh*t again chief" << endl;
             // turn(player, character);
+    }
+}
+
+void Board::events(int player) {
+    Characters &active = (player == 1) ? p1 : p2;
+
+    int eventnum = rand() % 48;
+    fstream EventsFile("events.txt");
+    if (EventsFile.fail()) {
+        cout << "File failed to open" << endl;
+        exit(-1);
+    }
+    string event[4], line;
+    int linecounter = 0;
+
+    while (getline(EventsFile, line)) {
+        int length = line.length(), barcounter = 0;
+        if (linecounter == eventnum) {
+            for (int i = 0; i < length; i++) {
+                if (line[i] == '\r') continue;
+
+                if (line[i] == '|') {
+                    barcounter++;
+                }
+                else {
+                    event[barcounter] = event[barcounter].append(line.substr(i, 1));
+                }
+            }
+        }
+        linecounter++;
+    }
+
+    cout << event[0] << "." << endl;
+    if ((event[1] == "0") && (event[2] != "0") && (active.advisor == stoi(event[2]))) {
+        cout << "Your advisor has saved you from misfortune! Your Discovery Points live to see" << endl;
+        cout << "another day." << endl;
+    }
+    else {
+        if (stoi(event[3]) > 0) {
+            cout << "This is fortunate. + " << event[3] << " Discovery Points" << endl;
+            DspAddition(player, stoi(event[3]));
+        }
+        else {
+            cout << "This is unfortunate. Better luck next time! " << endl;
+            cout << event[3] << " Discovery Points" << endl;
+            active.Dsp += stoi(event[3]);
+        }
+    }
+}
+
+void Board::misfortune(int player) {
+    Characters &active = (player == 1) ? p1 : p2;
+    cout << "A surprise event has struck player " << player << "!" << endl;
+    //riddle
+    if ((rand() % 2) == 1) {
+        string answer;
+        cout << "player " << player << " must solve a riddle: " << endl << endl;
+        int lineSelection = rand() % 25;
+        cout << riddles(lineSelection, true) << endl;
+        cin >> answer;
+        if (riddles(lineSelection, false) == answer) {
+            cout << "Wowie, you got it! That question was pretty easy though." << endl << "+500 Discovery Points" << endl;
+            DspAddition(player, 500);
+        }
+        else {
+            cout << "Haha I bet you wish that were the answer! It's actually " << riddles(lineSelection, false) << endl;
+            cout << "You failed so badly that you get a penalty!" << endl;
+            cout << "-500 Discovery Points for not paying more attention in class" << endl;
+            active.Dsp -= 500;
+        }
+    }
+    //event
+    else {
+        events(player);
+    }
+}
+
+void Board::DspAddition(int player, int amount){
+    if (p1.theft && player == 2) {
+        cout << "Your sworn enemy has managed to steal half of your beautiful Discovery Point earnings!" << endl;
+        p1.Dsp += amount/2;
+        p2.Dsp += amount/2;
+        p1.theft = false;
+    }
+    else if (p2.theft && player == 1) {
+        cout << "Your sworn enemy has managed to steal half of your beautiful Discovery Point earnings!" << endl;
+        p1.Dsp += amount/2;
+        p2.Dsp += amount/2;
+        p2.theft = false;
+    }
+    else {
+        if (player == 1) {
+            p1.Dsp += amount;
+        }
+        else {
+            p2.Dsp += amount;
+        }
     }
 }

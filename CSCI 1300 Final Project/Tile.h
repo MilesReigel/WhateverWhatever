@@ -1,3 +1,3 @@
 struct Tile {
-    char color;
+    unsigned char color;
 };
