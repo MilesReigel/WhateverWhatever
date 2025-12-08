@@ -40,13 +40,10 @@ int main() {
 
     system("pause");
 
-    while ((BigB.getPlayerPosition(p1c) < 52) || (BigB.getPlayerPosition(p2c) < 52)) {
+    while (true) {
         //if player 1 not finished
         if (BigB.getPlayerPosition(p1c) < 52) {
             BigB.turn(1);
-        }
-        else {
-
         }
         //if player 2 not finished
         if (BigB.getPlayerPosition(p2c) < 52) {

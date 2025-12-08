@@ -26,7 +26,7 @@ int main() {
     BigB.misfortune(1);
 
     //test playloop
-    while ((BigB.getPlayerPosition(p1c) < 52) || (BigB.getPlayerPosition(p2c) < 52)) {
+    while (true) {
         //if player 1 not finished
         if (BigB.getPlayerPosition(p1c) < 52) {
             BigB.turn(1);

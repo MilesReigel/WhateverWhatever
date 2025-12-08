@@ -418,10 +418,14 @@ void Board::Victory(int player_index) {
     active.finished = true;
     cout << "Player " << player << " has completed the game!" << endl;
     if (active.finished && opponent.finished) {
-        cout << "Both Players have completed the game!" << endl;
+        cout << "Both Players have now completed the game." << endl;
+        if (active.Dsp > opponent.Dsp) {
+            cout << "Player 1 has won the game with " << active.Dsp << "Discovery Points." << endl;
+            exit(0);
+        }
+        else {
+            cout << "Player 2 has won the game with " << opponent.Dsp << "Discovery Points." << endl;
+            exit(0);
+        }
     }
-    else if (active.finished && !opponent.finished) {
-        cout << "Player " << player << " has won! Congratulations. Player " << opponent.index + 1 << " must now complete the game." << endl;
-    }
-    exit(0);
 }
