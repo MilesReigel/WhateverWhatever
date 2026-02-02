@@ -1,6 +1,5 @@
 import matplotlib.pyplot as mp
 import numpy as np
-import csv
 
 ypoints = np.loadtxt("wind_data.csv", delimiter = ",")
 datacounter = 0
