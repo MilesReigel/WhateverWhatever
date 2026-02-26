@@ -4,7 +4,7 @@
 
 using namespace std;
 //declaration of independence
-int indexOfLargest = 0, totalwords = 0;
+int indexOfLargest = 0, totaluniquewords = 0, wordtotal = 0;
 string line, tempword;
 vector<string> wordvector;
 vector<int> wordcounts;
@@ -21,7 +21,7 @@ char lowercaseify(char c) {
 void putitinthere(string& inputword, vector<string>& wordvec, vector<int>& countvec) {
     wordvec.push_back(inputword);
     countvec.push_back(1);
-    totalwords++;
+    totaluniquewords++;
     inputword.clear();
 }
 
@@ -44,7 +44,7 @@ int main() {
                 
                 if (!tempword.empty()) {
                     bool found = false;
-                    for (int i = 0; i < totalwords; i++) {
+                    for (int i = 0; i < totaluniquewords; i++) {
                         if (wordvector[i] == tempword) {
                             wordcounts[i]++;
                             found = true;
@@ -58,21 +58,23 @@ int main() {
                 }
             }
         }
+        wordtotal++;
         tempword.clear();
     }
 
-    for (int i = 0; i < totalwords; i++) {
+    for (int i = 0; i < totaluniquewords; i++) {
         if (wordcounts[i] > wordcounts[indexOfLargest]) {
             indexOfLargest = i;
         }
     }
-
-    cout << "There are " << totalwords << " words in the song" << endl;
+    float percentage = totaluniquewords/wordtotal;
+    cout << "There are " << totaluniquewords << " unique words in the song" << endl;
+    cout << "This is " << percentage << " percent unique." << endl;
     cout << "The most common word is \"" << wordvector[indexOfLargest] << "\" at " << wordcounts[indexOfLargest] << " times." << endl << endl;
 
-    for (int i = 0; i < totalwords; i++) {
+    for (int i = 0; i < totaluniquewords; i++) {
         cout << i + 1 << ": \"" << wordvector[i] << "\" - " << wordcounts[i] << endl;
     }
-    
+
     return(0);
 }
