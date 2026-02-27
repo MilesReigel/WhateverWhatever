@@ -1,5 +1,5 @@
 import csv
-import matplotlib as plt
+import matplotlib.pyplot as plt
 import numpy as np
 # Note: I am aware that this is python and that the template was given for matlab- 
 # Professor Constante Flores told me that as long as I follow the same structure,
@@ -22,6 +22,7 @@ Vdc_min = 1300
 Vdc_max = 2000
 n_inv = 0.97
 
+PDC_target = P_AC_RATED * 1.3 # PDC target = 6MW * 1.3 = 7.8e6
 P_mod_STC = 550
 Vmp_STC = 41.5
 Vmp_beta = 0.12
@@ -92,8 +93,7 @@ if len(data) != 8760:
 
 n = 1
 Vmpmod_min, Vmpmod_max = 1000.0, 0.0
-Ns, Ns_min, Ns_max = 0, 0, 60
-
+Ns, Np ,Ns_min, Ns_max = 40, 0, 0, 60
 
 for row in data:
     t_solar = abs(row[0])
@@ -125,9 +125,34 @@ for row in data:
     # 6.2 - Feasible range for Ns
     Ns_min = np.ceil(Vdc_min / Vmpmod_min) #  Ns_min = 37
     Ns_max = np.floor(Vdc_max / Vmpmod_max) #  Ns_max = 44
-
+    # Vstring min at Ns_min = 1317.73
+    # Vstring max at Ns_min = 1650.94
+    # Vstring min at Ns_max = 1567.03
+    # Vstring max at Ns_max = 1963.28
 
     n += 1
+
+Vstring_min_at_NS_min = Vmpmod_min * Ns_min
+Vstring_max_at_NS_min = Vmpmod_max * Ns_min
+Vstring_min_at_NS_max = Vmpmod_min * Ns_max
+Vstring_max_at_NS_max = Vmpmod_max * Ns_max
+
+# 6.3 - Select Ns and compute Np to hit DC target
+# Ns = 40
+
+def PDCoptimization(Np):
+    return(abs(PDC_target - Np * Ns * P_mod_STC))
+
+i = 1
+while i <= 400:
+    if (PDCoptimization(i) < PDCoptimization(i - 1)): #  Np = 355
+        Np = i
+    i += 1
+
+P_DC_Achieved_W = Ns * Np * P_mod_STC
+P_DC_Achieved_MW = P_DC_Achieved_W / 1e6
+dc_ac_achieved = P_DC_Achieved_W / P_AC_RATED
+
 
 print("Vmpmod min/max: ")
 print(f"Min: {Vmpmod_min}")
@@ -136,3 +161,11 @@ print(f"Max: {Vmpmod_max}")
 print("Ns min/max: ")
 print(f"Min: {Ns_min}")
 print(f"Max: {Ns_max}")
+print(f"Vstring min at Ns min: {Vstring_min_at_NS_min}")
+print(f"Vstring max at Ns min: {Vstring_max_at_NS_min}")
+print(f"Vstring min at Ns max: {Vstring_min_at_NS_max}")
+print(f"Vstring max at Ns max: {Vstring_max_at_NS_max}")
+
+print(f"optimal Np = {Np}")
+print(f"Dc power achieved [W]: {P_DC_Achieved_W}")
+print(f"Dc power achieved [MW]: {P_DC_Achieved_MW}")
