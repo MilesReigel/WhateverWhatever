@@ -24,7 +24,7 @@ n_inv = 0.97
 
 P_mod_STC = 550
 Vmp_STC = 41.5
-Vmp_beta = -0.12
+Vmp_beta = 0.12
 Ns = 0
 
 gammaT = -0.004
@@ -58,7 +58,7 @@ def cos_ti(delta, omega):
     delta_r = np.radians(delta)
     omega_r = np.radians(omega)
     cos_ti = (
-        np.sin(delta_r) * np.sin(phi_r) * np.sin(beta_deg_r) - 
+        np.sin(delta_r) * np.sin(phi_r) * np.cos(beta_deg_r) - 
         np.sin(delta_r) * np.cos(phi_r) * np.sin(beta_deg_r) + 
         np.cos(delta_r) * np.cos(phi_r) * np.cos(beta_deg_r) * np.cos(omega_r) + 
         np.cos(delta_r) * np.sin(phi_r) * np.sin(beta_deg_r) * np.cos(omega_r))
@@ -80,9 +80,6 @@ def Tcell(Tamb, GPOA, Vwind):
         return(Tamb)
     else:
         return(Tcell)
-    
-def VmpString(Ns, Vmpmod):
-    return Ns * Vmpmod
 
 #open file
 with open('phoenix_hourly.csv', 'r') as file:
@@ -99,7 +96,7 @@ Ns, Ns_min, Ns_max = 0, 0, 60
 
 
 for row in data:
-    t_solar = row[0]
+    t_solar = abs(row[0])
     DNI = row[1]
     DHI = row[2]
     GHI = row[3]
@@ -120,22 +117,14 @@ for row in data:
             cos_ti(deltaD, omegaH)
     )
 
-    # 6.1 - hourly module MPP voltage Vmp,mod(t)
-    Vmpmod = Vmp_STC + Vmp_beta * (Tcell(Tamb, currentGPOA, Vwind) - 25) # Vmpmod = Vmp_STC + Vmp_beta * (Tcell - 25)
-    Vmpmod_min = min(Vmpmod, Vmpmod_min) #  Vmpmod_min = 35.88
+    # 6.1 - Hourly module MPP voltage Vmp,mod(t)
+    Vmpmod = Vmp_STC - Vmp_beta * (Tcell(Tamb, currentGPOA, Vwind) - 25) # Vmpmod = Vmp_STC + Vmp_beta * (Tcell - 25)
+    Vmpmod_min = min(Vmpmod, Vmpmod_min) #  Vmpmod_min = 35.61
     Vmpmod_max = max(Vmpmod, Vmpmod_max) #  Vmpmod_max = 44.62
 
     # 6.2 - Feasible range for Ns
-    Nsloopvar = 25
-    localmin, localmax = 60, 0
-    while Nsloopvar < 50:
-        vmpstr = VmpString(Nsloopvar, Vmpmod)
-        if (Vdc_min < vmpstr < Vdc_max):
-            localmin = min(localmin, Nsloopvar)
-            localmax = max(localmax, Nsloopvar)
-            Ns_min = max(Ns_min, localmin)
-            Ns_max = min(Ns_max, localmax)
-        Nsloopvar += 1        
+    Ns_min = np.ceil(Vdc_min / Vmpmod_min) #  Ns_min = 37
+    Ns_max = np.floor(Vdc_max / Vmpmod_max) #  Ns_max = 44
 
 
     n += 1
@@ -143,6 +132,7 @@ for row in data:
 print("Vmpmod min/max: ")
 print(f"Min: {Vmpmod_min}")
 print(f"Max: {Vmpmod_max}")
+
 print("Ns min/max: ")
 print(f"Min: {Ns_min}")
 print(f"Max: {Ns_max}")
