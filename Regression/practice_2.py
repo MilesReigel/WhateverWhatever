@@ -1,4 +1,5 @@
 # Practice to gain understanding of Neural Network
+# Doesn't really work but it helped me understand the theory :)
 import numpy as np
 
 possibleInputs = [[0, 0], [0, 1], [1, 0], [1, 1]]
@@ -11,13 +12,13 @@ class NodeData:
         self.weight = [w1, w2]
         self.bias = 0
 
-learnrate = 0.05
+learnrate = 0.5
 
 N1 = NodeData(0.3, -0.9)
 N2 = NodeData(-0.4, 0.2)
 output = NodeData(0.6, -0.1)
 
-for i in range(5000):
+for i in range(10000):
     for [input1, input2] in possibleInputs:
         target = input1 ^ input2
 
@@ -43,7 +44,7 @@ for i in range(5000):
         N2.bias += L1grad[1] * learnrate
         output.bias += grad * learnrate
 
-print("Training complete!\n")
+print("Training complete!")
 
 input1 = int(input("Input 1 (0 or 1): "))
 input2 = int(input("Input 2 (0 or 1): "))
@@ -55,4 +56,4 @@ L1output = [
 ]
 prediction = L1output[0] * output.weight[0] + L1output[1] * output.weight[1] + output.bias
 
-print(f"Input: {input1}, {input2} | Target: {target:>2} | Prediction: {prediction:.4f}")
+print(f"Target: {target:>2} | Prediction: {prediction:.4f}")
