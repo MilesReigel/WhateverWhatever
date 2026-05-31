@@ -1,0 +1,8 @@
+Notes for meeting on 6/2/26:
+ - Mondragon and SEU-MC teams seem to have both simply constructed concatenations of existing models, each taking in roughly 60 terms to predict core losses depending on temperature - coefficients are experimentally derived
+ - I cannot find anything for either of the white-box teams on their execution of the MagNet challenge (after looking on google scholar and stalking both university websites to find research groups)
+ - I spend a few hours playing around with PySR and was able to learn a few different things - 
+     - The algorith performs better with more constraints
+     - I fed it 4 of my 6 CPU cores and it took roughly 25 across several trials seconds to find a very accurate equation representing a relatively complex function given a relatively small amount of training data (150 datapoints), max frequency 4.7GHz
+     - The program can be customized to meet needs for levels of complexity, but sometimes it takes a lot longer to generate a slightly less complex equation (on the order of hours)
+     - Custom loss equations can help the algorithm move quicker to reduce losses 
