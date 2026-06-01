@@ -6,3 +6,6 @@ Notes for meeting on 6/2/26:
      - I fed it 4 of my 6 CPU cores and it took roughly 25 across several trials seconds to find a very accurate equation representing a relatively complex function given a relatively small amount of training data (150 datapoints), max frequency 4.7GHz
      - The program can be customized to meet needs for levels of complexity, but sometimes it takes a lot longer to generate a slightly less complex equation (on the order of hours)
      - Custom loss equations can help the algorithm move quicker to reduce losses 
+
+
+curl -L -o "TrainingData.zip" "https://www.dropbox.com/scl/fo/o07x7fa6d5elev19pzd1w/AGLfWtEXsY-ZHCeNNXkkF7Q/Training%20Data?dl=1&rlkey=8ec7mqukfr9no61h193zb4qdb&subfolder_nav_tracking=1"
