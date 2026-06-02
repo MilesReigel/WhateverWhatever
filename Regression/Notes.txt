@@ -7,3 +7,6 @@ Notes for meeting on 6/2/26:
      - The program can be customized to meet needs for levels of complexity, but sometimes it takes a lot longer to generate a slightly less complex equation (on the order of hours)
      - Custom loss equations can help the algorithm move quicker to reduce losses 
 
+play with one particular material with SR
+use given parameters and attempt to create fourier 
+explore existing generalized equations

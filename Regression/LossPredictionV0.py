@@ -21,11 +21,11 @@ with open('TrainingData/3C90/3C90_1_T.csv', 'r') as readData:
     reader = csv.reader(readData)
     T1_3C90_data = [[float(value) for value in sequence] for sequence in reader]
 
-def P_loss(B, H):
+def Pv_loss_row(B, H):
     np_H = np.array(H)
     dB = np.gradient(B, T_ns)
     P_loss = (dB * np_H) # H * dB given dt = T_ns
     return(P_loss)
 
 for Brow, Hrow in zip(B1_3C90_data, H1_3C90_data):
-    Pv_loss_total += P_loss(Brow, Hrow)
+    Pv_loss_total += Pv_loss_row(Brow, Hrow)
