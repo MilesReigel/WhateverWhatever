@@ -1,31 +1,31 @@
 from pysr import PySRRegressor
-from scipy.integrate import simpson
-import numpy as np
 import matplotlib.pyplot as plt
-import csv
+import scipy as sp
+import numpy as np
+import h5py
 
-# Data sampling frequency: 16MHz
-# File prefixes B, H, T for magnetic flux density, magnetic field strength and temperature
+# Notes:
+# Data sampling time is consistently 8ns
+T_interval = 8e-9 #seconds
 
-T_ns = 62.5
+# Discarding_info is 128x1, data included is of unknown purpose
+# Acquisition info is 294x1, similarly of unknown purpose
+# Duty cycle is ramped from 0.1P and 0.9N to 0.9P, 0.1N
 
-with open('TrainingData/3C90/3C90_1_B.csv', 'r') as readData:
-    reader = csv.reader(readData)
-    B1_3C90_data = [[float(value) for value in sequence] for sequence in reader]
+with h5py.File('3C90_Pretest_data/3C90_TX-25-15-10_Data1_Combined.mat', 'r') as file:
+    Data_raw = file['Data']
+    for key in Data_raw.keys(): # Process dataset into something interpretable
+        temp = Data_raw[key]
+        if temp.dtype == "<u2": # Characters as unsigned ints
+            str_assembly = ""
+            for outer in temp: # Arrays are occasionally mismatching in terms of row/columnization
+                for inner in outer:
+                    str_assembly += chr(inner)
+            print(f"(Key: {key}): {str_assembly}")
+        elif temp.shape == (1, 1):
+            print(f"{key}: {temp[0][0]}")
+        else:
+            print(temp)
 
-with open('TrainingData/3C90/3C90_1_H.csv', 'r') as readData:
-    reader = csv.reader(readData)
-    H1_3C90_data = [[float(value) for value in sequence] for sequence in reader]
-
-with open('TrainingData/3C90/3C90_1_T.csv', 'r') as readData:
-    reader = csv.reader(readData)
-    T1_3C90_data = [[float(value) for value in sequence] for sequence in reader]
-
-def Pv_loss_row(B, H):
-    np_H = np.array(H)
-    dB = np.gradient(B, T_ns)
-    P_loss = (dB * np_H) # H * dB given dt = T_ns
-    return(P_loss)
-
-for Brow, Hrow in zip(B1_3C90_data, H1_3C90_data):
-    Pv_loss_total += Pv_loss_row(Brow, Hrow)
+    freq_data = Data_raw['Frequency_command']
+    print(freq_data[:])

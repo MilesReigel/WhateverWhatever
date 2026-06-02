@@ -1,3 +1,13 @@
+Work Hours:
+5/26: 1
+5/27: 3
+5/28: 6
+5/29: 2
+5/30: 7
+5/31: 1
+6/01: 7
+6/02: 3+
+
 Notes for meeting on 6/2/26:
  - Mondragon and SEU-MC teams seem to have both simply constructed concatenations of existing models, each taking in roughly 60 terms to predict core losses depending on temperature - coefficients are experimentally derived
  - I cannot find anything for either of the white-box teams on their execution of the MagNet challenge (after looking on google scholar and stalking both university websites to find research groups)
