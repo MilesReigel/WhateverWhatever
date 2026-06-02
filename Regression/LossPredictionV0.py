@@ -4,7 +4,7 @@ import scipy as sp
 import numpy as np
 import h5py
 
-# Notes:
+# Notes:)
 # Data sampling time is consistently 8ns
 T_interval = 8e-9 #seconds, 8 ns
 
