@@ -6,7 +6,8 @@ Work Hours:
 5/30: 7
 5/31: 1
 6/01: 7
-6/02: 7
+6/02: 9
+6/03: 3+
 
 Notes for meeting on 6/2/26:
  - Mondragon and SEU-MC teams seem to have both simply constructed concatenations of existing models, each taking in roughly 60 terms to predict core losses depending on temperature - coefficients are experimentally derived
