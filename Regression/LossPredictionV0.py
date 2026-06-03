@@ -1,16 +1,15 @@
 from pysr import PySRRegressor
 import matplotlib.pyplot as plt
-import scipy as sp
+from scipy.fft import fft
 import numpy as np
 import h5py
 
-# Notes:)
-# Data sampling time is consistently 8ns
-T_interval = 8e-9 #seconds, 8 ns
+# Potentially fft-modelable data: Freq. command, Hdc command, Flux command, Temp. command, Duty command
 
-# Discarding_info is 128x1, data included is of unknown purpose
-# Acquisition info is 294x1, similarly of unknown purpose
-# Duty cycle is ramped from 0.1P and 0.9N to 0.9P, 0.1N
+def P_loss(meas_duration, voltage, current): # Requires input array of entire measurement periods for voltage and current
+    V, I = np.array(voltage), np.array(current) # allow element-wise multiplication of arrays
+    p = 1/(meas_duration) * sum(V * I)
+    return(p)
 
 with h5py.File('3C90_Pretest_data/3C90_TX-25-15-10_Data1_Combined.mat', 'r') as file:
     Data_raw = file['Data']
@@ -23,10 +22,26 @@ with h5py.File('3C90_Pretest_data/3C90_TX-25-15-10_Data1_Combined.mat', 'r') as 
                     str_assembly += chr(inner)
             print(f"{key}: {str_assembly}")
         elif temp.shape == (1, 1):
-            print(f"{key}: {temp[0][0]}")
+            print(f"{key}: {temp[0, 0]}")
         else:
             print(temp)
-
-    time_data = Data_raw['Sampling_Time']
-
     
+    time_raw = Data_raw['Sampling_Time']
+    datapoints = len(time_raw[0, :])
+    sampling_time = time_raw[0, 0]
+
+    voltage_raw = Data_raw['Voltage']
+    current_raw = Data_raw['Current']
+
+    # xdata = np.arange(0, sampling_time * datapoints, sampling_time)
+    P_loss_list = []
+    for i in range(datapoints):
+        P_loss_list.append(P_loss(10000 * sampling_time, voltage_raw[:, i], current_raw[:, i]))
+
+    xdata = np.arange(datapoints)
+
+    plt.plot(xdata, P_loss_list)
+    plt.savefig('temp_plot.png')
+
+# Last changes made: power plotting!
+# Next on the to-do list is to incorporate fft/modeling of other components in order to increase eff. of PySR, and potentially save P_loss data to a file so that it does not have to be recalculated every time
