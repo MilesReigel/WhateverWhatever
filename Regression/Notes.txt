@@ -7,9 +7,10 @@ Work Hours:
 5/31: 1
 6/01: 7
 6/02: 9
-6/03: 3+
+6/03: 4
+6/04: 7
 
-Notes for meeting on 6/2/26:
+Notes for meeting on 6/2:
  - Mondragon and SEU-MC teams seem to have both simply constructed concatenations of existing models, each taking in roughly 60 terms to predict core losses depending on temperature - coefficients are experimentally derived
  - I cannot find anything for either of the white-box teams on their execution of the MagNet challenge (after looking on google scholar and stalking both university websites to find research groups)
  - I spend a few hours playing around with PySR and was able to learn a few different things - 
@@ -21,3 +22,11 @@ Notes for meeting on 6/2/26:
 play with one particular material with SR
 use given parameters and attempt to create fourier 
 explore existing generalized equations
+
+Notes for meeting on 6/5:
+ - I finally understand the data format lol
+ - data is challenging because much of it is not downsampleable
+     - breaking it into small pieces to perform regression on seems promising, otherwise perhaps pre-processing with NN?
+        - some data sets like Hdc and Flux_command cannot be downsampled, not sure if they are really reduceable without use of pre-processing
+     - V and I data can be fft'd but requre 10+ components to reconstruct with decent precision
+ - if each block of data is SR'd (say maybe 20+) each could then be compiled into a random dataset and SR'd from there to make a giant compound function (but it might suck)
