@@ -1,38 +1,54 @@
 from pysr import PySRRegressor
 import matplotlib.pyplot as plt
 from scipy.fft import fft, fftfreq
-from scipy.signal import find_peaks
+from scipy.signal import find_peaks, detrend
 import numpy as np
 import h5py
 
 #figure out fft of data, complete B, H and mu functions, figure out how to group SR batches/ downsample data
 
-def B_t(n_samples):
-    return()
+def B_t(A, N2, V_t):
+    B_t = np.zeros(1024)
+    for i in range(1024):
+        B_t[i] = V_t[0]/(A * N2) if i == 0 else B_t[i-1] + V_t[i]/(A * N2)
+    return B_t
 
-def H_cycle(n_samples,):
-    semthing = here
+def fft_B(A, N2, data): # test
+    for f, a, p in data:
+        a /= (2 * np.pi * f * A * N2)
+        p -= np.pi / 2
 
-def mu_a_cycle(n_samples,):
-    same = thing
+def H_t(L, N1, I_t):
+    H_t = np.zeros(1024)
+    for H, I in zip(H_t, I_t):
+        H =  I * (N1 / L)
+    return H_t
 
-def get_data(filename):
+def mu_a(B_t, H_t):
+    return (max(B_t) - min(B_t))/(max(H_t) - min(H_t))
+
+def get_data(filename): # pull necessary data from the file, store to object and close the file to reduce memory usage
     data = h5py.File(filename, 'r')
-    return(data['Data'])
+    return data['Data']
 
-def ship_of_theseus(sampling_time, wave): # returns (frequency, amplitude) of 10 most prominent components of given wave
-    x = fftfreq(1024, sampling_time)[:512] # its funny because if you take apart the wave and replace all of its parts with new waves is it the same wave? also double entendre because its a ship... and waves... 
+def ship_of_theseus(sampling_time, wave, n, is_B): # returns (frequency, amplitude, phase) of n most prominent components of given wave
+    x = fftfreq(1024, sampling_time / 1024)[:512]
     y = fft(wave)
     amplitudes = np.abs(y[:512]) / 512
-    frequency_idxs, _ = find_peaks(amplitudes, height = 0.05 * max(amplitudes))
-    a_s = np.sort(amplitudes)
-    cutoff = a_s[10] # take top 10 amplitudes
-    del a_s
+    phases = np.angle(y[:512])
+    frequency_idxs, _ = find_peaks(amplitudes, height = 0.01 * max(amplitudes))
+    peak_amps = amplitudes[frequency_idxs]
+    top_idxs = frequency_idxs[np.argsort(peak_amps)[-min(n, len(peak_amps)):]] # indexes of top amplitudes
     top = []
-    for idx in frequency_idxs:
-        if amplitudes[idx] > cutoff:
-            top.append((x[idx], amplitudes[idx]))
-    return(top)
+    for idx in top_idxs:
+        top.append((x[idx], amplitudes[idx], phases[idx]))
+    return top
+
+def recombobulate(time, data):
+    combobulated_wave = np.zeros(1024)
+    for f, a, phase in data:
+        combobulated_wave += a * np.cos(2 * time * f * np.pi + phase)
+    return combobulated_wave # + (max(combobulated_wave) - min(combobulated_wave)) / 2
 
 class Materials:
     def __init__(self, V, I, DutyN, DutyP, Temp, Flux, Freq, Hdc, Area, N1, N2, samples, sampling_time):
@@ -71,7 +87,7 @@ for key in Data_raw.keys():
         print(f"{key}: Shape {temp.shape}, type {temp.dtype}")
 
 
-m1 = Materials( # pull necessary data from the file, store to object m1 and close the file to reduce memory usage
+m1 = Materials( 
     Data_raw['Voltage'],
     Data_raw['Current'], 
     Data_raw['DutyN_command'], 
@@ -87,9 +103,16 @@ m1 = Materials( # pull necessary data from the file, store to object m1 and clos
     Data_raw['Sampling_Time'])
 del Data_raw
 
-
-# calculate b and h here
-del m1.V, m1.I
+index = 12000
+temp_time = m1.sampling_time[index]
+t_series = np.arange(0, temp_time, temp_time/1024)
+B_ifft_fft_V_t = recombobulate(t_series, ship_of_theseus(temp_time, m1.V[:, index], 20)) # B_t(m1.Area, m1.N2, m1.V[:, index])
+ifft_B_fft_V_t = recombobulate(t_series, ship_of_theseus(temp_time, B_t(m1.Area, m1.N2, m1.V[:, index]), 20))
+plt.plot(t_series, B_t(m1.Area, m1.N2, B_fft_V_t), label = "B(fft(V(t)))", color = 'b')
+plt.plot(t_series, fft_B_V_t, label = "fft(B(V(t)))", color = 'r')
+plt.plot(t_series, B_t(m1.Area, m1.N2, m1.V[:, index]), label = "B(V(t))", color = 'k')
+plt.legend()
+plt.savefig('temp')
 
 
 # temp_points = [25.0, 50.0, 70.0, 90.0]
@@ -158,3 +181,4 @@ model2 = PySRRegressor(
     elementwise_loss = "loss(prediction, target) = (prediction - target)^2",)
 # model1.fit(xdata, loss[groups[25.0][0]:groups[50.0][0]])
 # model2.fit(xdata, loss[groups[25.0][0]:groups[50.0][0]])
+
