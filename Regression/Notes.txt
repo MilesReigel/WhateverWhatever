@@ -5,6 +5,7 @@ Work Hours:
 5/29: 2
 5/30: 7
 5/31: 1
+Week hour total: 20
 6/01: 7
 6/02: 9
 6/03: 4
@@ -38,9 +39,13 @@ I have spent far too long staring at the ship of theseus with no results.
 Why is it doing this
 Help me
 
+Week total: 36
+
 6/07: 3h
 Finally have fft pipeline working, need to organize data and make it more efficient because its very messy right now
 
 6/08 1h
 Making object for B and H organization, its not working (need to somehow organize so that f, a, p, dc are clustered?)
 num_terms needs work because its manual atm
+
+6/09

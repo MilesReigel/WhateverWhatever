@@ -1,11 +1,9 @@
 from pysr import PySRRegressor
 import matplotlib.pyplot as plt
-from scipy.fft import fft, fftfreq
+from scipy.fft import fft, fft2, fftfreq
 from scipy.signal import find_peaks, detrend
 import numpy as np
 import h5py
-
-# Start with 3 fourier terms, advance if greater accuracy is needed
 
 
 def B_t(A, N2, V_t, sampling_time):
@@ -141,13 +139,23 @@ r2 = groups[50.0][0]
 
 
 print("Computing Losses. . .")
-for i in range(r2 - r1):
+
+V_slice = m1.V[r1:r2]
+I_slice = m1.I[r1:r2]
+V_fft_bulk = fft2(V_slice)[:, :512]
+I_fft_bulk = fft2(I_slice)[:, :512]
+n = r2 - r1
+
+for i in range(n):
+    _ = _
+
+for i in range(n):
     time = m1.sampling_time[i]
     for data, coeff in zip(B_from_fft(m1.Area, m1.N2, ship_of_theseus(time, m1.V[i], m1.num_f_coeffs), time), range(m1.num_f_coeffs)):
         m1.B_t[coeff].amplitude[i], m1.B_t[coeff].frequency[i], m1.B_t[coeff].phase[i], m1.B_t[coeff].dc_offset[i] = data
     for data, coeff in zip(H_from_fft(m1.L, m1.N1, ship_of_theseus(time, m1.I[i], m1.num_f_coeffs)), range(m1.num_f_coeffs)):
         m1.H_t[coeff].amplitude[i], m1.H_t[coeff].frequency[i], m1.H_t[coeff].phase[i], m1.H_t[coeff].dc_offset[i] = data
-    print(f"Index {i}: {(r2 - r1) / (r2 - i)}% complete")
+    if i % 500 == 0: print(f"Processed {i / n}% of data. . .")
 del m1.V, m1.I
 
 
@@ -185,7 +193,6 @@ y = np.column_stack((
     m1.H_t[1].dc_offset[r1:r2],
     m1.H_t[2].dc_offset[r1:r2]))
 del m1.H_t
-
 
 print("Beginning Optimization. . .") # divided into two sections to reduce weight randomization as precision increases
 model1 = PySRRegressor(
