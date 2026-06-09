@@ -15,13 +15,13 @@ def B_t(A, N2, V_t, sampling_time):
 
 def B_from_fft(A, N2, data, sampling_time): # returns (frequency, amplitude, phase, dc offset) of B_t
     # 1/(A * N2) INT(V_t) = 1/(A * N2) * INT(a * cos(wt + p)) = 1/(A * N2) * a/w * sin(wt + p) = 1/(A * N2) * a/w * cos(wt + p + pi/2) -> a /= w*A*N2, f = f, p += pi/2
-    data_out = []
+    TX = []
     for f, a, phase in data:
         new_a = a / (2 * np.pi * f * A * N2)
         new_p = phase - (np.pi / 2)
         dc_offset = -new_a * np.cos((f * 2 * np.pi * sampling_time / 1024) + new_p)
-        data_out.append((f, new_a, new_p, dc_offset))
-    return data_out
+        TX.append((f, new_a, new_p, dc_offset))
+    return TX
 
 def H_t(L, N1, I_t):
     H_t = np.zeros(1024)
@@ -33,7 +33,7 @@ def H_from_fft(L, N1, data): # returns (frequency, amplitude, phase, 0) of H_t
     data_out = []
     for f, a, phase in data:
         new_a = a * N1 / L
-        data_out.append((f, new_a, phase, 0))
+        data_out.append(np.array(f, new_a, phase, 0))
     return data_out
 
 def mu_a(B_t, H_t):
@@ -64,8 +64,15 @@ def recombobulate(time, data):
     return combobulated_wave
 
 
+class Fourier_representation: #adjust to take variable number of terms as separate parameters (perhaps f1, f2, etc.)
+    def __init__(self, range, num_terms):
+        self.frequency = np.zeros(range, num_terms)
+        self.amplitude = np.zeros(range, num_terms)
+        self.phase = np.zeros(range, num_terms)
+        self.dc_offset = np.zeros(range, num_terms)
+
 class Materials:
-    def __init__(self, V, I, DutyN, DutyP, Temp, Flux, Freq, Hdc, Area, L, N1, N2, samples, sampling_time):
+    def __init__(self, V, I, DutyN, DutyP, Temp, Flux, Freq, Hdc, Area, L, N1, N2, samples, sampling_time, num_fourier_terms):
         self.V = V
         self.I = I
         self.duty_dif = np.zeros((samples), dtype = 'f4')
@@ -77,8 +84,8 @@ class Materials:
         self.L = L[0, 0]
         self.N1 = N1[0, 0]
         self.N2 = N2[0, 0]
-        self.B_t = np.zeros(samples, dtype = 'f8')
-        self.H_t = np.zeros(samples, dtype = 'f8')
+        self.B_t = Fourier_representation(samples, num_fourier_terms)
+        self.H_t = Fourier_representation(samples, num_fourier_terms)
         self.samples = samples
         self.sampling_time = sampling_time[0, :]
 
@@ -116,15 +123,9 @@ m1 = Materials(
     Data_raw['Primary_Turns'],
     Data_raw['Secondary_Turns'],
     len(Data_raw['Sampling_Time'][0]),
-    Data_raw['Sampling_Time'])
+    Data_raw['Sampling_Time'],
+    3)
 del Data_raw
-
-
-print("Computing Losses. . .")
-for Vcycle, Icycle, time in zip(m1.V, m1.I, m1.sampling_time):
-    m1.B_t = B_from_fft(m1.Area, m1.N2, ship_of_theseus(time, Vcycle, 3), time)
-    m1.H_t = H_from_fft(m1.L, m1.N1, ship_of_theseus(time, Icycle, 3))
-del m1.V, m1.I
 
 
 # temp_points = [25.0, 50.0, 70.0, 90.0]
@@ -133,9 +134,18 @@ for i, t in enumerate(m1.Temp):
     if t in groups:
         groups[t][1] += 1 # size of group
         groups[t][0] = i if groups[t][0] is None else groups[t][0] # start index
-
 r1 = groups[25.0][0]
 r2 = groups[50.0][0]
+
+
+print("Computing Losses. . .")
+for i in range(r2 - r1):
+    time = m1.sampling_time[i]
+    m1.B_t.amplitude[i], m1.B_t.frequency[i], m1.B_t.phase[i], m1.B_t.dc_offset[i] = B_from_fft(m1.Area, m1.N2, ship_of_theseus(time, m1.V[i], 3), time)
+    m1.H_t[i, :] = H_from_fft(m1.L, m1.N1, ship_of_theseus(time, m1.I[i], 3))
+    print(f"Index {i}: {(r2 - r1) / (r2 - i)}% complete")
+del m1.V, m1.I
+
 
 x = np.column_stack((
     m1.Temp[r1:r2],

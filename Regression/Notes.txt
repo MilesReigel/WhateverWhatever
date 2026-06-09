@@ -33,7 +33,14 @@ Notes for meeting on 6/5:
 
 Daily notes:
 ------------------------------------------------------------------------
-6/05: 7+ h
+6/05: 8h
 I have spent far too long staring at the ship of theseus with no results. 
 Why is it doing this
 Help me
+
+6/07: 3h
+Finally have fft pipeline working, need to organize data and make it more efficient because its very messy right now
+
+6/08 1h
+Making object for B and H organization, its not working (need to somehow organize so that f, a, p, dc are clustered?)
+num_terms needs work because its manual atm
