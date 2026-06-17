@@ -17,6 +17,14 @@ def B_from_fft(A, N2, data, sampling_time): # returns (frequency, amplitude, pha
         TX.append((f, new_a, new_p, dc_offset))
     return TX
 
+def H_from_fft(L, N1, data, sampling_time):
+    TX = []
+    for f, a, p in data:
+        new_a = a * (m1.N1 / m1.L)
+        dc_offset = -new_a * np.cos((f * 2 * np.pi * sampling_time / 1024) + p)
+        TX.append((f, new_a, p, dc_offset))
+    return TX
+        
 def get_data(filename): # pull necessary data from the file, store to object and close the file to reduce memory usage
     data = h5py.File(filename, 'r')
     return data['Data']
@@ -28,7 +36,7 @@ def ship_of_theseus(sampling_time, y, n): # returns (frequency, amplitude, phase
     phases = np.angle(y)
     frequency_idxs, _ = find_peaks(amplitudes, height = 0.01 * max(amplitudes))
     peak_amps = amplitudes[frequency_idxs]
-    top_idxs = frequency_idxs[np.argsort(peak_amps)[-min(n, len(peak_amps)):]] # indexes of top amplitudes
+    top_idxs = frequency_idxs[np.argsort(peak_amps)[-min(n, len(peak_amps)):]] # indices of top amplitudes
     top = []
     for idx in top_idxs:
         top.append((x[idx], amplitudes[idx], phases[idx]))
@@ -63,6 +71,7 @@ class Materials:
         self.sampling_time = sampling_time[0, :]
         self.num_f_coeffs = num_f_coeffs
         self.B_t = [Fourier_representation(samples) for _ in range(num_f_coeffs)] # [T]
+        self.H_t = [Fourier_representation(samples) for _ in range(num_f_coeffs)] # [A/m]
         self.loss = np.zeros(samples) # [W/m^3]
 
 
@@ -104,65 +113,77 @@ try: # Process data or use preprocessed data in csv file
         for row, i in zip(reader, range(m1.samples)):
             for coeff in range(m1.num_f_coeffs):
                 m1.B_t[coeff].frequency[i], m1.B_t[coeff].amplitude[i], m1.B_t[coeff].phase[i], m1.B_t[coeff].dc_offset[i] = row[coeff * 4:(1 + coeff) * 4]
-            m1.loss[i] = row[12]
+                m1.H_t[coeff].frequency[i], m1.H_t[coeff].amplitude[i], m1.H_t[coeff].phase[i], m1.H_t[coeff].dc_offset[i] = row[(m1.num_f_coeffs * 4) + coeff * 4:(m1.num_f_coeffs * 4) + (coeff + 1) * 4]
+            m1.loss[i] = row[m1.num_f_coeffs * 8]
     print(f"Using preprocessed data from file 3C90_Processed_data_{m1.num_f_coeffs}_coeffs.csv")
+
 except FileNotFoundError:
     print("Processing data...")
     V_fft_bulk = fft2(np.transpose(m1.V))[:, :512]
+    I_fft_bulk = fft2(np.transpose(m1.I))[:, :512]
     with open(f"3C90_Processed_data_{m1.num_f_coeffs}_coeffs.csv", "w") as preprocessed_data:
         writer = csv.writer(preprocessed_data)
         for i in range(m1.samples):
             time = m1.sampling_time[i]
             B_t_raw = B_from_fft(m1.Area, m1.N2, ship_of_theseus(time, V_fft_bulk[i], m1.num_f_coeffs), time)
+            H_t_raw = H_from_fft(m1.L, m1.N1, ship_of_theseus(time, I_fft_bulk[i], m1.num_f_coeffs), time)
             while len(B_t_raw) < m1.num_f_coeffs:
                 B_t_raw.append((0, 0, 0, 0))
+            while len(H_t_raw) < m1.num_f_coeffs:
+                H_t_raw.append((0, 0, 0, 0))
             row = []
-            for data, coeff in zip(B_t_raw, range(m1.num_f_coeffs)):
-                m1.B_t[coeff].frequency[i], m1.B_t[coeff].amplitude[i], m1.B_t[coeff].phase[i], m1.B_t[coeff].dc_offset[i] = data
-                for d in data: row.append(d)
+            for Bdata, Hdata, coeff in zip(B_t_raw, H_t_raw, range(m1.num_f_coeffs)):
+                m1.B_t[coeff].frequency[i], m1.B_t[coeff].amplitude[i], m1.B_t[coeff].phase[i], m1.B_t[coeff].dc_offset[i] = Bdata
+                m1.H_t[coeff].frequency[i], m1.H_t[coeff].amplitude[i], m1.H_t[coeff].phase[i], m1.H_t[coeff].dc_offset[i] = Hdata
+                for d in Bdata: row.append(d)
+                for d in Hdata: row.append(d)
             m1.loss[i] = (m1.Freq[i] / m1.Volume) * sum(m1.V[:, i] * m1.I[:, i] * m1.sampling_time[i]) # Volumetric core loss: f/Ve * INT 0|1/f (V(t) * I(t)) dt
             row.append(m1.loss[i])
-            writer.writerow(row) # organized data as f1, a1, p1, dc1, f2, a2... losses
-            if i % 4000 == 0: print(f"Processed {(i / m1.samples) * 100}% of data...")
+            writer.writerow(row) # organized data as B(f1, a1, p1, dc1, f2, a2)... H(f1, a1, p1, dc1, f2, a2)... losses
+            if i % 4000 == 0: print(f"Processed {((i / m1.samples) * 100):.2f}% of data...")
     print("Data processed!")
-del m1.V
+del m1.V, m1.I
 
-
-# groups = {25.0: [None, 0], 50.0: [None, 0], 70.0: [None, 0], 90.0: [None, 0]}
-# for i, t in enumerate(m1.Temp):
-#     if t in groups:
-#         groups[t][1] += 1 # size of group
-#         groups[t][0] = i if groups[t][0] is None else groups[t][0] # start index
-# r1 = groups[25.0][0]
-# r2 = groups[50.0][0]
-
-num = m1.samples // 400
-y, j = [], 0
-x = np.zeros((400, 15))
-for i in range(m1.samples):
-    if (i % num == 0 and i != 0):
-        x[j, :] =[
-        m1.B_t[0].amplitude[i],
-        m1.B_t[0].frequency[i],
-        m1.B_t[0].phase[i],
-        m1.B_t[0].dc_offset[i],
-        m1.B_t[1].amplitude[i],
-        m1.B_t[1].frequency[i],
-        m1.B_t[1].phase[i],
-        m1.B_t[1].dc_offset[i],
-        m1.B_t[2].amplitude[i],
-        m1.B_t[2].frequency[i],
-        m1.B_t[2].phase[i],
-        m1.B_t[2].dc_offset[i],
-        m1.Temp[i],
-        m1.Freq[i], 
-        m1.sampling_time[i]]
-        y.append(m1.loss[i])
-        j += 1
-del m1.Temp, m1.Freq, m1.B_t
-y = np.array(y, dtype = np.float64)
 
 print("Beginning optimization...")
+num = m1.samples // 400
+j = 0
+y = np.zeros(400)
+x = np.zeros((400, (m1.num_f_coeffs * 8) + 3))
+for i in range(m1.samples):
+    if (i % num == 0 and i != 0):
+        x[j, :] = [
+            m1.B_t[0].amplitude[i],
+            m1.B_t[0].frequency[i],
+            m1.B_t[0].phase[i],
+            m1.B_t[0].dc_offset[i],
+            m1.B_t[1].amplitude[i],
+            m1.B_t[1].frequency[i],
+            m1.B_t[1].phase[i],
+            m1.B_t[1].dc_offset[i],
+            m1.B_t[2].amplitude[i],
+            m1.B_t[2].frequency[i],
+            m1.B_t[2].phase[i],
+            m1.B_t[2].dc_offset[i],
+            m1.Temp[i],
+            m1.Freq[i], 
+            m1.sampling_time[i],
+            m1.H_t[0].amplitude[i],
+            m1.H_t[0].frequency[i],
+            m1.H_t[0].phase[i],
+            m1.H_t[0].dc_offset[i],
+            m1.H_t[1].amplitude[i],
+            m1.H_t[1].frequency[i],
+            m1.H_t[1].phase[i],
+            m1.H_t[1].dc_offset[i],
+            m1.H_t[2].amplitude[i],
+            m1.H_t[2].frequency[i],
+            m1.H_t[2].phase[i],
+            m1.H_t[2].dc_offset[i]]
+        y[j] = m1.loss[i]
+        j += 1
+del m1.Temp, m1.Freq, m1.B_t, m1.H_t
+
 template = TemplateExpressionSpec(
     expressions = ["f"],
     variable_names = ["F0", "A0", "P0", "D0", "F1", "A1", "P1", "D1", "F2", "A2", "P2", "D2", "T", "FR", "t"],
@@ -178,7 +199,7 @@ model1 = PySRRegressor(
     populations = 8,
     maxsize = 30,
     maxdepth = 8,
-    weight_randomize = 0.4,
+    weight_randomize = 0.1,
     ncycles_per_iteration = 600,
     complexity_of_constants = 3,
     early_stop_condition = ("stop_if(loss, complexity) = (complexity < 30 && loss < 5e4) || (loss < 1e2)"),
@@ -190,6 +211,8 @@ model1 = PySRRegressor(
         "sin": {"log": 1, "sin": 1, "cos": 1, "exp": 1},
         "cos": {"log": 1, "sin": 1, "cos": 1, "exp": 1},
         "exp": {"log": 1, "sin": 1, "cos": 1, "exp": 1},},
-    # elementwise_loss = "loss(prediction, target) = (prediction - target)^2",
+    loss_function = """
+    function custom_wave_loss(tree, dataset::) # CUSTOM LOSS FUNCTION HAS TO BE COMPLETED, H_t IS STILL APPENDED TO X AND THEREFORE TEMPLATE MUST BE ADJUSTED
+    """
      )
 model1.fit(x, y)
